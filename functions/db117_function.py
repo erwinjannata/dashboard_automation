@@ -132,7 +132,7 @@ def inbound_data(username, password, date_thru, date_from, loop, combine, penari
             # Wait for file to be downloaded, if in 10 minutes files not detected try to download again
             while not os.path.isfile(rf"{working_dir}\{penarikan}\Inbound .xlsx"):
                 time.sleep(15)
-                if datetime.now() - download_time > timedelta(minutes=10):
+                if datetime.now() - download_time > timedelta(minutes=5):
                     download_btn.click()
 
             # Rename downloaded file
