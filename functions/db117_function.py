@@ -46,7 +46,8 @@ def inbound_data(username, password, date_thru, date_from, loop, combine, penari
         login_button.click()
 
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Logged in as {username} \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')}  - Logged in as {username} \n")
+        log.see("end")
 
         current_url = driver.current_url
         url_parts = current_url.split(":")
@@ -127,13 +128,15 @@ def inbound_data(username, password, date_thru, date_from, loop, combine, penari
             download_time = datetime.now()
 
             log.insert(
-                tk.END, f"{datetime.now().strftime('%H.%M %p')} - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+                tk.END, f"{datetime.now().strftime('%H:%M')}  - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+            log.see("end")
 
-            # Wait for file to be downloaded, if in 10 minutes files not detected try to download again
+            # Wait for file to be downloaded, if in 5 minutes files not detected try to download again
             while not os.path.isfile(rf"{working_dir}\{penarikan}\Inbound .xlsx"):
                 time.sleep(15)
                 if datetime.now() - download_time > timedelta(minutes=5):
                     download_btn.click()
+                    download_time = datetime.now()
 
             # Rename downloaded file
             if os.path.isfile(rf"{working_dir}\{penarikan}\Inbound .xlsx"):
@@ -146,18 +149,21 @@ def inbound_data(username, password, date_thru, date_from, loop, combine, penari
 
         if combine == True:
             log.insert(
-                tk.END, f"{datetime.now().strftime('%H.%M %p')} - Combining data... \n")
+                tk.END, f"{datetime.now().strftime('%H:%M')}  - Combining data... \n")
+            log.see("end")
             combine_files(files=saved_files,
                           start_date=date_from, end_date=date_thru, is_standalone=False)
 
         driver.quit()
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Process finished \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')}  - Process finished \n")
+        log.see("end")
         showinfo(title="Message", message="Proses Selesai")
     except Exception as e:
         driver.quit()
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Process failed \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')}  - Process failed \n")
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Reason: {e} \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')}  - Reason: {e} \n")
+        log.see("end")
         showinfo(title="Error", message=e)

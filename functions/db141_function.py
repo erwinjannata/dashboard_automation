@@ -29,7 +29,7 @@ def outbound_data(username, password, date_thru, date_from, loop, combine, penar
             'http://10.18.2.51:8080/apex/f?p=141:LOGIN_DESKTOP:15219642399791:::::')
 
         used_date = date_thru
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 3600)
 
         username_form = wait.until(
             EC.presence_of_element_located((By.ID, 'P101_USERNAME')))
@@ -46,7 +46,8 @@ def outbound_data(username, password, date_thru, date_from, loop, combine, penar
         login_button.click()
 
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Logged in as {username} \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')} - Logged in as {username} \n")
+        log.see("end")
 
         current_url = driver.current_url
         url_parts = current_url.split(":")
@@ -75,6 +76,12 @@ def outbound_data(username, password, date_thru, date_from, loop, combine, penar
                 (By.ID, 'B12943525354637205515')))
             go_btn.click()
 
+            time.sleep(10)
+
+            wait.until(EC.invisibility_of_element_located(
+                (By.XPATH, '//*[@id="loadingIcon"]')
+            ))
+
             result_page = f'http://10.18.2.51:8080/apex/f?p=141:95:{session}::NO:RP,RIR,95::'
             driver.get(result_page)
 
@@ -82,7 +89,8 @@ def outbound_data(username, password, date_thru, date_from, loop, combine, penar
             driver.get(download_page)
 
             log.insert(
-                tk.END, f"{datetime.now().strftime('%H.%M %p')} - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+                tk.END, f"{datetime.now().strftime('%H:%M')} - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+            log.see("end")
 
             # Wait for file to be downloaded
             while not os.path.isfile(rf'{working_dir}\{penarikan}\detail.csv'):
@@ -99,18 +107,21 @@ def outbound_data(username, password, date_thru, date_from, loop, combine, penar
 
         if combine == True:
             log.insert(
-                tk.END, f"{datetime.now().strftime('%H.%M %p')} - Combining data... \n")
+                tk.END, f"{datetime.now().strftime('%H:%M')} - Combining data... \n")
+            log.see("end")
             combine_files(files=saved_files,
                           start_date=date_from, end_date=date_thru, is_standalone=False)
 
         driver.quit()
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Process finished \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')} - Process finished \n")
+        log.see("end")
         showinfo(title="Message", message="Proses Selesai")
     except Exception as e:
         driver.quit()
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Process failed \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')} - Process failed \n")
         log.insert(
-            tk.END, f"{datetime.now().strftime('%H.%M %p')} - Reason: {e} \n")
+            tk.END, f"{datetime.now().strftime('%H:%M')} - Reason: {e} \n")
+        log.see("end")
         showinfo(title="Error", message=e)
