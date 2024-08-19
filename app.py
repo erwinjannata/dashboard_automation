@@ -3,9 +3,9 @@ from datetime import datetime
 from tkinter import ttk, filedialog
 from tkcalendar import DateEntry
 from tkinter.messagebox import showinfo
-from functions.db117_function import inbound_data
+from functions.db117_function import inbound_data117, outbound_data117
 from functions.general_function import combine_files
-from functions.db141_function import outbound_data
+from functions.db141_function import outbound_data141, inbound_data141
 import tkinter.scrolledtext as tkst
 import tkinter as tk
 import threading
@@ -14,7 +14,7 @@ import threading
 # Interface configuration
 root = tk.Tk()
 root.configure(bg='white')
-root.title('JNE AMI Dashboard Automation')
+root.title('JNE AMI Dashboard Automation v.1.0')
 root.resizable(0, 0)
 
 # Variables
@@ -35,16 +35,39 @@ def main_process():
     working_directory = Path.cwd()
 
     if (username and password) and diff.days >= 0:
+        # 141 - Outbound
         if mode == 0:
             progressbar.start()
-            outbound_data(username=username, password=password, date_thru=date2, date_from=date, loop=(
-                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\141", log=log_box)
-        if mode == 1:
+            outbound_data141(username=username, password=password, date_thru=date2, date_from=date, loop=(
+                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\141\Outbound", log=log_box)
+        # 141 - Intracity
+        elif mode == 1:
             progressbar.start()
-            inbound_data(username=username, password=password, date_thru=date2, date_from=date, loop=(
-                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\117", log=log_box)
+            inbound_data141(mode=2, username=username, password=password, date_thru=date2, date_from=date, loop=(
+                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\141\Intracity", log=log_box)
+        # 141 - Inbound End-To-End
+        elif mode == 2:
+            progressbar.start()
+            inbound_data141(mode=0, username=username, password=password, date_thru=date2, date_from=date, loop=(
+                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\141\Inbound End-To-End", log=log_box)
+        # 141 - Inbound Summary
+        elif mode == 3:
+            progressbar.start()
+            inbound_data141(mode=1, username=username, password=password, date_thru=date2, date_from=date, loop=(
+                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\141\Inbound Summary", log=log_box)
+        # ---------- # ---------- #
+        # 117 - Inbound
+        elif mode == 4:
+            progressbar.start()
+            inbound_data117(username=username, password=password, date_thru=date2, date_from=date, loop=(
+                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\117\Inbound", log=log_box)
+        # 117 - Outbound
+        elif mode == 5:
+            progressbar.start()
+            outbound_data117(username=username, password=password, date_thru=date2, date_from=date, loop=(
+                diff.days + 1), combine=is_combine.get(), penarikan=jam_penarikan, working_dir=rf"{working_directory}\117\Outbound", log=log_box)
     elif not username or not password:
-        if mode == 2:
+        if mode == 6:
             files = filedialog.askopenfilenames(filetypes=(
                 ("Excel Workbook", "*.xlsx"),
                 ("Comma Separated Values", "*.csv"),
@@ -104,9 +127,14 @@ combo_label = ttk.Label(root, text="Download Data",
                         background="white", font="calibri 11 bold").grid(row=0, column=0, pady=5, padx=5, sticky='w')
 combo_box = ttk.Combobox(root, textvariable=mode, width=53)
 combo_box['value'] = (
-    '141 - Outbound',
-    '117 - Inbound',
-    'Gabung Data')
+    '141 - Outbound',   # 0
+    '141 - Intracity',  # 1
+    '141 - Inbound End-To-End', # 2
+    '141 - Inbound Summary', # 3
+    '117 - Inbound',    # 4
+    '117 - Outbound',   # 5
+    'Gabung Data',  # 6
+    )  
 combo_box.current(0)
 combo_box.grid(row=1, column=0, pady=5, padx=5, sticky='w', columnspan=2)
 
