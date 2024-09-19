@@ -9,12 +9,13 @@ from functions.db141_function import outbound_data141, inbound_data141
 import tkinter.scrolledtext as tkst
 import tkinter as tk
 import threading
+import configparser
 
 
 # Interface configuration
 root = tk.Tk()
 root.configure(bg='white')
-root.title('JNE AMI Dashboard Automation v.1.0')
+root.title('JNE AMI Dashboard Automation v.1.1')
 root.resizable(0, 0)
 
 # Variables
@@ -92,6 +93,7 @@ def main_process():
     password_entry.configure(state='normal')
     show_password.config(state='normal')
     command_btn.state(['!disabled'])
+    setting_btn.state(['!disabled'])
 
 
 def start_thread(event):
@@ -106,6 +108,7 @@ def start_thread(event):
     password_entry.configure(state='disabled')
     show_password.config(state='disabled')
     command_btn.state(['disabled'])
+    setting_btn.state(['disabled'])
     root.after(5, check_thread_process)
 
 
@@ -120,6 +123,58 @@ def toggle_check():
         password_entry.config(show="*")
     else:
         password_entry.config(show="")
+
+def open_setting():
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    
+    base_link117 = config.get('base_links', '117')
+    base_link141 = config.get('base_links', '141')
+    base_link207 = config.get('base_links', '207')
+
+    new_window = tk.Toplevel(master=root)
+    new_window.title('Settings')
+    new_window.configure(bg='white')
+    new_window.resizable(0,0)
+
+    def save():
+        config.set('base_links', '141', entry_141.get())
+        config.set('base_links', '117', entry_117.get())
+        config.set('base_links', '207', entry_207.get())
+
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
+        
+        showinfo(title='Success', message="Saved")
+        new_window.lift()
+
+
+    label_141 = ttk.Label(new_window, text="Dashboard 141", background="white", font="calibri 11 bold").grid(
+    row=0, column=0, pady=5, padx=5, sticky='w')
+
+    entry_141 = tk.Entry(new_window, background='white', width=50)
+    entry_141.insert(0, base_link141)
+    entry_141.grid(row=1, column=0, pady=5, padx=5, sticky='w', columnspan=2)
+    
+    label_117 = ttk.Label(new_window, text="Dashboard 117", background="white", font="calibri 11 bold").grid(
+    row=2, column=0, pady=5, padx=5, sticky='w')
+
+    entry_117 = tk.Entry(new_window, background='white', width=50)
+    entry_117.insert(0, base_link117)
+    entry_117.grid(row=3, column=0, pady=5, padx=5, sticky='w', columnspan=2)
+    
+    label_207 = ttk.Label(new_window, text="Dashboard 207", background="white", font="calibri 11 bold").grid(
+    row=4, column=0, pady=5, padx=5, sticky='w')
+
+    entry_207 = tk.Entry(new_window, background='white', width=50)
+    entry_207.insert(0, base_link207)
+    entry_207.grid(row=5, column=0, pady=5, padx=5, sticky='w', columnspan=2)
+
+    save_btn = ttk.Button(new_window, text="Save", state=tk.NORMAL, width=10, command=lambda: save())
+    save_btn.grid(row=6, column=1, pady=5, padx=5, sticky='e')
+
+    new_window.mainloop()
+
 
 
 # GUI
@@ -180,6 +235,9 @@ show_password.grid(row=9, column=0, pady=5, padx=5, sticky='w')
 command_btn = ttk.Button(root, text="Start",
                          command=lambda: start_thread(None), state=tk.NORMAL, width=26)
 command_btn.grid(row=6, column=1, pady=5, padx=5, sticky='e')
+
+setting_btn = ttk.Button(root, text="Settings", command=lambda: open_setting(), state=tk.NORMAL, width=26)
+setting_btn.grid(row=7, column=1, pady=5, padx=5, sticky='e')
 
 log_label = tk.Label(root, text='Log', background='white', font='calibri 11 bold').grid(
     row=0, column=2, pady=5, padx=5, sticky='w')

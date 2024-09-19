@@ -10,9 +10,16 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
+import configparser
 
 
 def outbound_data141(username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    
+    base_link = config.get('base_links', '141')
+
+
     download_dir = rf"{working_dir}\{penarikan}"
     options = webdriver.EdgeOptions()
     options.use_chromium = True
@@ -22,16 +29,14 @@ def outbound_data141(username, password, date_thru, date_from, loop, combine, pe
         "download.default_directory": download_dir})
     driver = webdriver.Edge(service=Service(
         EdgeChromiumDriverManager().install()), options=options)
+    used_date = date_thru
+    wait = WebDriverWait(driver, 3600)
 
     saved_files = []
+    
+    driver.get(base_link)
 
     try:
-        driver.get(
-            'http://10.18.2.51:8080/apex/f?p=141:LOGIN_DESKTOP:15219642399791:::::')
-
-        used_date = date_thru
-        wait = WebDriverWait(driver, 3600)
-
         username_form = wait.until(
             EC.presence_of_element_located((By.ID, 'P101_USERNAME')))
 
@@ -53,10 +58,11 @@ def outbound_data141(username, password, date_thru, date_from, loop, combine, pe
         current_url = driver.current_url
         url_parts = current_url.split(":")
 
-        current_page = url_parts[3]
-        session = url_parts[4]
+        current_page = url_parts[2]
+        session = url_parts[3]
 
-        outbound_page = f"http://10.18.2.51:8080/apex/f?p=141:54:{session}::NO:RIR,1:P0_REP_FLAG:1"
+        # outbound_page = f"{base_link}:54:{session}::NO:RIR,1:P0_REP_FLAG:1"
+        outbound_page = f"{base_link}:54:{session}::NO:RIR,54:P0_REP_FLAG:1"
 
         for i in range(0, loop):
             driver.get(outbound_page)
@@ -83,10 +89,10 @@ def outbound_data141(username, password, date_thru, date_from, loop, combine, pe
                 (By.XPATH, '//*[@id="loadingIcon"]')
             ))
 
-            result_page = f'http://10.18.2.51:8080/apex/f?p=141:95:{session}::NO:RP,RIR,95::'
+            result_page = f'{base_link}:95:{session}::NO:RP,RIR,95::'
             driver.get(result_page)
 
-            download_page = f"http://10.18.2.51:8080/apex/f?p=141:95:{session}:CSV::::"
+            download_page = f"{base_link}:95:{session}:CSV::::"
             driver.get(download_page)
 
             log.insert(
@@ -129,6 +135,11 @@ def outbound_data141(username, password, date_thru, date_from, loop, combine, pe
 
 
 def inbound_data141(mode, username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    
+    base_link = config.get('base_links', '141')
+
     download_dir = rf"{working_dir}\{penarikan}"
     options = webdriver.EdgeOptions()
     options.use_chromium = True
@@ -140,14 +151,12 @@ def inbound_data141(mode, username, password, date_thru, date_from, loop, combin
         EdgeChromiumDriverManager().install()), options=options)
 
     saved_files = []
+    driver.get(base_link)
+
+    used_date = date_thru
+    wait = WebDriverWait(driver, 3600)
 
     try:
-        driver.get(
-            'http://10.18.2.51:8080/apex/f?p=141:LOGIN_DESKTOP:15219642399791:::::')
-
-        used_date = date_thru
-        wait = WebDriverWait(driver, 3600)
-
         # Login
         username_form = wait.until(
             EC.presence_of_element_located((By.ID, 'P101_USERNAME')))
@@ -170,8 +179,8 @@ def inbound_data141(mode, username, password, date_thru, date_from, loop, combin
         current_url = driver.current_url
         url_parts = current_url.split(":")
 
-        current_page = url_parts[3]
-        session = url_parts[4]
+        current_page = url_parts[2]
+        session = url_parts[3]
 
         page_code = [
             # [Page Code, End Page Code, Result Code]
@@ -181,7 +190,7 @@ def inbound_data141(mode, username, password, date_thru, date_from, loop, combin
         ]
 
         # Go to Inbound Page
-        inbound_page = f"http://10.18.2.51:8080/apex/f?p=141:{page_code[mode][0]}:{session}::NO:RIR,{page_code[mode][0]}:P0_REP_FLAG:{page_code[mode][1]}"
+        inbound_page = f"{base_link}:{page_code[mode][0]}:{session}::NO:RIR,{page_code[mode][0]}:P0_REP_FLAG:{page_code[mode][1]}"
 
         for i in range(0, loop):
             driver.get(inbound_page)
@@ -216,14 +225,14 @@ def inbound_data141(mode, username, password, date_thru, date_from, loop, combin
             # Go to Result Page
             # End-To-End
             if mode == 0:
-                result_page = f'http://10.18.2.51:8080/apex/f?p=141:64:{session}:IR_110406:NO:RP,64::'
+                result_page = f'{base_link}:64:{session}:IR_110406:NO:RP,64::'
             # Summary & Intracity
             else:
-                result_page = f'http://10.18.2.51:8080/apex/f?p=141:{page_code[mode][2]}:{session}::NO:RP,RIR,{page_code[mode][2]}::'
+                result_page = f'{base_link}:{page_code[mode][2]}:{session}::NO:RP,RIR,{page_code[mode][2]}::'
 
             driver.get(result_page)
 
-            download_page = f"http://10.18.2.51:8080/apex/f?p=141:{page_code[mode][2]}:{session}:CSV::::"
+            download_page = f"{base_link}:{page_code[mode][2]}:{session}:CSV::::"
             driver.get(download_page)
 
             log.insert(

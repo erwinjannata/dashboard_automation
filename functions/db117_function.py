@@ -10,9 +10,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
-
+import configparser
 
 def inbound_data117(username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    
+    base_link = config.get('base_links', '117')
+
     options = webdriver.EdgeOptions()
     options.use_chromium = True
     options.add_argument("start-maximized")
@@ -25,8 +30,7 @@ def inbound_data117(username, password, date_thru, date_from, loop, combine, pen
     saved_files = []
 
     try:
-        driver.get(
-            'http://app.jne.co.id:7777/ords/f?p=117:LOGIN_DESKTOP:410809499327:::::')
+        driver.get(base_link)
 
         used_date = date_thru
         wait = WebDriverWait(driver, 3600)
@@ -55,7 +59,7 @@ def inbound_data117(username, password, date_thru, date_from, loop, combine, pen
         current_page = url_parts[3]
         session = url_parts[4]
 
-        inbound_page = f"http://app.jne.co.id:7777/ords/f?p=117:56:{session}:::::"
+        inbound_page = f"{base_link}:56:{session}:::::"
 
         for i in range(0, loop):
             driver.get(inbound_page)
@@ -170,6 +174,11 @@ def inbound_data117(username, password, date_thru, date_from, loop, combine, pen
 
 
 def outbound_data117(username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    
+    base_link = config.get('base_links', '117')
+    
     options = webdriver.EdgeOptions()
     options.use_chromium = True
     options.add_argument("start-maximized")
@@ -182,8 +191,7 @@ def outbound_data117(username, password, date_thru, date_from, loop, combine, pe
     saved_files = []
 
     try:
-        driver.get(
-            'http://app.jne.co.id:7777/ords/f?p=117:LOGIN_DESKTOP:410809499327:::::')
+        driver.get(base_link)
 
         used_date = date_thru
         wait = WebDriverWait(driver, 3600)
@@ -212,7 +220,7 @@ def outbound_data117(username, password, date_thru, date_from, loop, combine, pe
         current_page = url_parts[3]
         session = url_parts[4]
 
-        outbound_page = f"http://app.jne.co.id:7777/ords/f?p=117:53:{session}:::::"
+        outbound_page = f"{base_link}:53:{session}:::::"
 
         for i in range(0, loop):
             driver.get(outbound_page)
@@ -249,7 +257,7 @@ def outbound_data117(username, password, date_thru, date_from, loop, combine, pe
             ))
             
             # Go into HAWB Page
-            result_page = f"http://app.jne.co.id:7777/ords/f?p=117:55:{session}:::RP,RIR,55:IREQ_SHIPMENT_TYPE:DOMESTIC"
+            result_page = f"{base_link}:55:{session}:::RP,RIR,55:IREQ_SHIPMENT_TYPE:DOMESTIC"
             driver.get(result_page)
 
             # Remove Shipment Type : Domestic
