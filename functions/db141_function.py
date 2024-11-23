@@ -1,24 +1,23 @@
 import os
 import time
+import configparser
 import tkinter as tk
-from datetime import timedelta, datetime
+from selenium import webdriver
 from tkinter.messagebox import showinfo
+from datetime import timedelta, datetime
 from selenium.webdriver.common.by import By
+from selenium.webdriver.edge.service import Service
 from functions.general_function import combine_files
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium import webdriver
-from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
-import configparser
 
 
 def outbound_data141(username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
     config = configparser.ConfigParser()
     config.read('config.ini')
-    
-    base_link = config.get('base_links', '141')
 
+    base_link = config.get('base_links', '141')
 
     download_dir = rf"{working_dir}\{penarikan}"
     options = webdriver.EdgeOptions()
@@ -33,7 +32,7 @@ def outbound_data141(username, password, date_thru, date_from, loop, combine, pe
     wait = WebDriverWait(driver, 3600)
 
     saved_files = []
-    
+
     driver.get(base_link)
 
     try:
@@ -137,7 +136,7 @@ def outbound_data141(username, password, date_thru, date_from, loop, combine, pe
 def inbound_data141(mode, username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
     config = configparser.ConfigParser()
     config.read('config.ini')
-    
+
     base_link = config.get('base_links', '141')
 
     download_dir = rf"{working_dir}\{penarikan}"
@@ -196,7 +195,8 @@ def inbound_data141(mode, username, password, date_thru, date_from, loop, combin
             driver.get(inbound_page)
 
             if mode == 2:
-                wait.until(EC.presence_of_element_located((By.NAME, 'P0_REP_DATE')))
+                wait.until(EC.presence_of_element_located(
+                    (By.NAME, 'P0_REP_DATE')))
                 option_input = driver.find_element(By.NAME, 'P0_REP_DATE')
                 option_input.send_keys('AWB')
 

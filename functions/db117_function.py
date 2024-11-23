@@ -1,21 +1,22 @@
 import os
 import time
+import configparser
 import tkinter as tk
-from datetime import timedelta, datetime
+from selenium import webdriver
 from tkinter.messagebox import showinfo
+from datetime import timedelta, datetime
 from selenium.webdriver.common.by import By
+from selenium.webdriver.edge.service import Service
 from functions.general_function import combine_files
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium import webdriver
-from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
-import configparser
+
 
 def inbound_data117(username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
     config = configparser.ConfigParser()
     config.read('config.ini')
-    
+
     base_link = config.get('base_links', '117')
 
     options = webdriver.EdgeOptions()
@@ -176,9 +177,9 @@ def inbound_data117(username, password, date_thru, date_from, loop, combine, pen
 def outbound_data117(username, password, date_thru, date_from, loop, combine, penarikan, working_dir, log):
     config = configparser.ConfigParser()
     config.read('config.ini')
-    
+
     base_link = config.get('base_links', '117')
-    
+
     options = webdriver.EdgeOptions()
     options.use_chromium = True
     options.add_argument("start-maximized")
@@ -229,7 +230,8 @@ def outbound_data117(username, password, date_thru, date_from, loop, combine, pe
             regional_btn = wait.until(EC.presence_of_element_located(
                 (By.ID, 'P53_REGIONAL')))
             regional_btn.send_keys('JTBNN')
-            wait.until(EC.text_to_be_present_in_element((By.ID, 'P53_REGIONAL'), 'JTBNN'))
+            wait.until(EC.text_to_be_present_in_element(
+                (By.ID, 'P53_REGIONAL'), 'JTBNN'))
 
             # Fill Branch
             branch_btn = wait.until(EC.presence_of_element_located(
@@ -255,16 +257,18 @@ def outbound_data117(username, password, date_thru, date_from, loop, combine, pe
             wait.until(EC.invisibility_of_element_located(
                 (By.XPATH, '//*[@id="loadingIcon"]')
             ))
-            
+
             # Go into HAWB Page
             result_page = f"{base_link}:55:{session}:::RP,RIR,55:IREQ_SHIPMENT_TYPE:DOMESTIC"
             driver.get(result_page)
 
             # Remove Shipment Type : Domestic
-            remove_button = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#a_Collapsible1_INB_control_panel_content > ul > li > span.a-IRR-controls-cell.a-IRR-controls-cell--remove > button')))
+            remove_button = wait.until(EC.presence_of_element_located(
+                (By.CSS_SELECTOR, '#a_Collapsible1_INB_control_panel_content > ul > li > span.a-IRR-controls-cell.a-IRR-controls-cell--remove > button')))
             remove_button.click()
 
-            wait.until_not(EC.presence_of_element_located((By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul')))
+            wait.until_not(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul')))
 
             inbound_action_btn = wait.until(
                 EC.presence_of_element_located((By.ID, 'INB_actions_button')))
@@ -272,7 +276,7 @@ def outbound_data117(username, password, date_thru, date_from, loop, combine, pe
 
             download_menu = wait.until(EC.presence_of_element_located(
                 (By.XPATH, '//*[@id="INB_actions_menu_14i"]')))
-            
+
             download_menu.click()
 
             excel_btn = wait.until(EC.presence_of_element_located(
