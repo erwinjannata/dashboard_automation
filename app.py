@@ -43,10 +43,6 @@ def main_process():
     global apex_file_name
     apex_file_name = ""
 
-    # Apex
-    # username_apex="ami.opr-cabang@jne.co.id",
-    # password_apex="jne1234",
-
     if (username and password) and diff.days >= 0:
         if is_apex.get() == True:
             try:
