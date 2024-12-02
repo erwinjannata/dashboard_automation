@@ -22,7 +22,7 @@ def combine_files(files, start_date, end_date, is_standalone):
         saved_as = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[
             ("Excel Workbook (.xlsx)", "*.xlsx")])
     else:
-        saved_as = f"{path}/{start_date.strftime('%d-%b-%Y')} - {end_date.strftime('%d-%b-%Y')}.xlsx"
+        saved_as = rf"{path}\{start_date.strftime('%d-%b-%Y')} - {end_date.strftime('%d-%b-%Y')}.xlsx"
 
     app = xl.App(visible=False)
 
@@ -62,3 +62,5 @@ def combine_files(files, start_date, end_date, is_standalone):
     app.quit()
     if is_standalone == True:
         showinfo(title="Message", message="Proses Selesai")
+    else:
+        return saved_as

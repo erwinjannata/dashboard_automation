@@ -18,7 +18,7 @@ def open_setting(rootWindow):
     base_urlApex16 = config.get('base_links', 'Apex16')
 
     new_window = tk.Toplevel(master=rootWindow)
-    new_window.title('Settings')
+    new_window.title('Pengaturan')
     new_window.configure(bg='white')
     new_window.resizable(0, 0)
 
@@ -97,7 +97,7 @@ def open_setting(rootWindow):
                       sticky='w', columnspan=2)
 
     # Save Button
-    save_btn = ttk.Button(new_window, text="Save",
+    save_btn = ttk.Button(new_window, text="Simpan",
                           state=tk.NORMAL, width=10, command=lambda: save())
     save_btn.grid(row=6, column=3, pady=5, padx=5, sticky='e')
 
