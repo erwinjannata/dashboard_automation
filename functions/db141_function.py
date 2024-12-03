@@ -175,6 +175,9 @@ class DB141:
 
             # Upload to apex
             if self.is_apex == True:
+                self.log.insert(
+                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
+                self.log.see("end")
                 apex_fn = ApexDB(username=self.username_apex,
                                  password=self.password_apex,
                                  files=combined_file,
@@ -184,9 +187,6 @@ class DB141:
                                  working_dir=self.working_dir,
                                  awb_column="CNOTE NO")
                 apex_fn.send_to_apex()
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
-                self.log.see("end")
 
             self.log.insert(
                 tk.END, f"{datetime.now().strftime('%H:%M')} - Process finished \n")
@@ -261,7 +261,7 @@ class DB141:
 
             page_code = [
                 # [Page Code, End Page Code, Result Code]
-                ['1', '1', '64'],       # 0 - End-To-End
+                ['1', '1', '120'],       # 0 - End-To-End
                 ['24', '24', '64'],     # 1 - Summary
                 ['72', '1', '75'],      # 2 - Intracity
             ]
@@ -304,14 +304,17 @@ class DB141:
                 wait.until(EC.invisibility_of_element_located(
                     (By.XPATH, '//*[@id="loadingIcon"]')
                 ))
+                time.sleep(10)
 
                 # Intracity data doesn't need to be generated
-                if self.mode != 2:
+                if self.mode < 2:
                     # Wait data to be generated
-                    time.sleep(10)
+                    loading_img = [
+                        '//*[@id="report_R37362249766539564772"]/div/div[1]/table/tbody/tr/td[2]/button/img',
+                        '//*[@id="report_R29705817846763909733"]/div/div[1]/table/tbody/tr/td[2]/button/img'
+                    ]
                     wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH,
-                         '//*[@id="report_R29576385550981813706"]/div/div[1]/table/tbody/tr/td[2]/button/img')
+                        (By.XPATH, loading_img[self.mode])
                     ))
 
                     # Refresh page after data generated
@@ -330,6 +333,7 @@ class DB141:
 
                 # Go to Result Page
                 result_page.click()
+                time.sleep(5)
 
                 # Start download proccess
                 download_page = f"{base_link}:{page_code[self.mode][2]}:{session}:CSV::::"
@@ -367,6 +371,9 @@ class DB141:
 
             # Upload to apex
             if self.is_apex == True:
+                self.log.insert(
+                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
+                self.log.see("end")
                 apex_fn = ApexDB(username=self.username_apex,
                                  password=self.password_apex,
                                  files=combined_file,
@@ -374,11 +381,8 @@ class DB141:
                                  time="",
                                  apex_type=self.apex_type,
                                  working_dir=self.working_dir,
-                                 awb_column="CNOTE NO")
-                apex_fn.get_awb()
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
-                self.log.see("end")
+                                 awb_column="AWB NO")
+                apex_fn.send_to_apex()
 
             self.log.insert(
                 tk.END, f"{datetime.now().strftime('%H:%M')} - Process finished \n")

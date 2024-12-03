@@ -6,15 +6,6 @@ from tkinter import filedialog
 from tkinter.messagebox import showinfo
 
 
-def split_file(file):
-    try:
-        df = pd.read_csv(file)
-
-    except:
-        showinfo(title="Error",
-                 message="Program mengalami masalah, silahkan hubungi tim IT.")
-
-
 def combine_files(files, start_date, end_date, is_standalone):
     path = os.path.split(files[0])[0]
     saved_as = ""

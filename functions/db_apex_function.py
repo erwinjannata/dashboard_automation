@@ -37,19 +37,20 @@ class ApexDB:
         filename = os.path.split(self.name)
         filepath = filename[0]
         desired_name = filename[1].split(".")[0]
+        max_lines = 20000
 
         # Export to csv
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 
         if df_length > 20000:
-            loop = math.ceil(df_length / 20000)
+            loop = math.ceil(df_length / max_lines)
             for i in range(loop):
                 export_to = rf"{filepath}/{desired_name}({i}).csv"
-                df.to_csv(export_to, columns=[self.awb_column],
-                          index=False, header=False)
+                data = df[(max_lines * i):(max_lines * (i + 1))]
+                data.to_csv(export_to, columns=[self.awb_column],
+                            index=False, header=False)
                 apex_files.append(export_to)
-
         else:
             df.to_csv(rf"{self.name}", columns=[self.awb_column],
                       index=False, header=False)

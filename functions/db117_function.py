@@ -54,6 +54,9 @@ class DB117:
         try:
             # Access Dashboard
             driver.get(base_link)
+            self.log.insert(
+                tk.END, f"{datetime.now().strftime('%H:%M')} - Download Inbound data from DB 117  \n")
+            self.log.see("end")
 
             # Read first date, Ascending order
             used_date = self.date_from
@@ -216,6 +219,9 @@ class DB117:
 
             # Upload to apex
             if self.is_apex == True:
+                self.log.insert(
+                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
+                self.log.see("end")
                 apex_fn = ApexDB(username=self.username_apex,
                                  password=self.password_apex,
                                  files=combined_file,
@@ -225,9 +231,6 @@ class DB117:
                                  working_dir=self.working_dir,
                                  awb_column="Hawb No")
                 apex_fn.send_to_apex()
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
-                self.log.see("end")
 
             self.log.insert(
                 tk.END, f"{datetime.now().strftime('%H:%M')}  - Process finished \n")
@@ -265,6 +268,9 @@ class DB117:
         try:
             # Access dashboard
             driver.get(base_link)
+            self.log.insert(
+                tk.END, f"{datetime.now().strftime('%H:%M')} - Download Outbound data from DB 117  \n")
+            self.log.see("end")
 
             # Read first date, Ascending order
             used_date = self.date_from
@@ -425,6 +431,9 @@ class DB117:
 
             # Upload to apex
             if self.is_apex == True:
+                self.log.insert(
+                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
+                self.log.see("end")
                 apex_fn = ApexDB(username=self.username_apex,
                                  password=self.password_apex,
                                  files=combined_file,
@@ -434,9 +443,6 @@ class DB117:
                                  working_dir=self.working_dir,
                                  awb_column="Cnote No")
                 apex_fn.send_to_apex()
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')} - Uploading data to ApexDB... \n")
-                self.log.see("end")
 
             self.log.insert(
                 tk.END, f"{datetime.now().strftime('%H:%M')}  - Process finished \n")
