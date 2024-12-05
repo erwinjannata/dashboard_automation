@@ -7,7 +7,7 @@ from tkinter.messagebox import showinfo
 from datetime import timedelta, datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.service import Service
-from functions.general_function import combine_files
+from functions.general_function import combine_files, check_file
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
@@ -93,72 +93,85 @@ class DB141:
 
             # Download data
             for i in range(0, self.loop):
-                # Go to Outbound Data Page
-                driver.get(outbound_page)
+                is_verified = False
 
-                # Clear Date Input Form
-                wait.until(
-                    EC.presence_of_element_located((By.NAME, 'P0_DATE1')))
-                date_from_input = driver.find_element(By.NAME, 'P0_DATE1')
-                date_from_input.clear()
-                wait.until(
-                    EC.presence_of_element_located((By.NAME, 'P0_DATE2')))
-                date_thru_input = driver.find_element(By.NAME, 'P0_DATE2')
-                date_thru_input.clear()
+                # Verifiy datas date before going into next iteration
+                while is_verified == False:
+                    # Go to Outbound Data Page
+                    driver.get(outbound_page)
 
-                # Input Date
-                date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
-                date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    # Clear Date Input Form
+                    wait.until(
+                        EC.presence_of_element_located((By.NAME, 'P0_DATE1')))
+                    date_from_input = driver.find_element(By.NAME, 'P0_DATE1')
+                    date_from_input.clear()
+                    wait.until(
+                        EC.presence_of_element_located((By.NAME, 'P0_DATE2')))
+                    date_thru_input = driver.find_element(By.NAME, 'P0_DATE2')
+                    date_thru_input.clear()
 
-                # Proceed
-                go_btn = wait.until(EC.presence_of_element_located(
-                    (By.ID, 'B12943525354637205515')))
-                go_btn.click()
+                    # Input Date
+                    date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
 
-                # Wait until loading done
-                time.sleep(10)
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH, '//*[@id="loadingIcon"]')
-                ))
+                    # Proceed
+                    go_btn = wait.until(EC.presence_of_element_located(
+                        (By.ID, 'B12943525354637205515')))
+                    go_btn.click()
 
-                # Wait data to be generated
-                time.sleep(10)
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH,
-                     '//*[@id="report_R29576385550981813706"]/div/div[1]/table/tbody/tr/td[2]/button/img')
-                ))
+                    # Wait until loading done
+                    time.sleep(10)
+                    wait.until(EC.invisibility_of_element_located(
+                        (By.XPATH, '//*[@id="loadingIcon"]')
+                    ))
 
-                # Refresh page after data generated
-                time.sleep(5)
-                driver.refresh()
+                    # Wait data to be generated
+                    time.sleep(10)
+                    wait.until(EC.invisibility_of_element_located(
+                        (By.XPATH,
+                         '//*[@id="report_R29576385550981813706"]/div/div[1]/table/tbody/tr/td[2]/button/img')
+                    ))
 
-                # Go to result page
-                result_link = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="14532092005068365313_orig"]/tbody/tr[2]/td[1]/a')))
-                result_link.click()
+                    # Refresh page after data generated
+                    time.sleep(5)
+                    driver.refresh()
 
-                wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="C5777933338987697868"]/a')))
+                    # Go to result page
+                    result_link = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="14532092005068365313_orig"]/tbody/tr[2]/td[1]/a')))
+                    result_link.click()
 
-                # Start download proccess
-                download_page = f"{base_link}:95:{session}:CSV::::"
-                driver.get(download_page)
+                    wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="C5777933338987697868"]/a')))
 
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')} - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
-                self.log.see("end")
+                    # Start download proccess
+                    download_page = f"{base_link}:95:{session}:CSV::::"
+                    driver.get(download_page)
 
-                # Wait for file to be downloaded
-                while not os.path.isfile(rf'{download_dir}\detail.csv'):
-                    time.sleep(15)
+                    self.log.insert(
+                        tk.END, f"{datetime.now().strftime('%H:%M')} - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+                    self.log.see("end")
 
-                # Rename downloaded file
-                result_filename = rf'{download_dir}\{used_date.strftime("%d-%b-%Y")}.csv'
-                if os.path.isfile(rf'{download_dir}\detail.csv'):
-                    os.rename(rf'{download_dir}\detail.csv', result_filename)
-                    saved_files.append(result_filename)
+                    # Wait for file to be downloaded
+                    while not os.path.isfile(rf'{download_dir}\detail.csv'):
+                        time.sleep(15)
 
-                # Change date
+                    # Rename downloaded file
+                    default_filepath = rf'{download_dir}\detail.csv'
+                    if os.path.isfile(default_filepath):
+                        # Rename file
+                        renamed_file = rf'{download_dir}\{used_date.strftime("%d-%b-%Y")}.csv'
+                        os.rename(default_filepath, renamed_file)
+                        # Verifiy date inside file
+
+                        is_verified = check_file(
+                            file=renamed_file, current_date=used_date.date(), column_name='CNOTE DATE')
+
+                        # Append file to list of downloaded file
+                        if is_verified:
+                            saved_files.append(renamed_file)
+
+                # Change date and proceed to next iterarion
                 used_date += timedelta(days=1)
 
             # Close webdriver
@@ -270,91 +283,106 @@ class DB141:
             inbound_page = f"{base_link}:{page_code[self.mode][0]}:{session}::NO:RIR,{page_code[self.mode][0]}:P0_REP_FLAG:{page_code[self.mode][1]}"
 
             for i in range(0, self.loop):
-                # Go to Inbound Data Page
-                driver.get(inbound_page)
+                is_verified = False
 
-                # Change data type
-                if self.mode == 2:
-                    wait.until(EC.presence_of_element_located(
-                        (By.NAME, 'P0_REP_DATE')))
-                    option_input = driver.find_element(By.NAME, 'P0_REP_DATE')
-                    option_input.send_keys('AWB')
+                # Verifiy datas date before going into next iteration
+                while is_verified == False:
+                    # Go to Inbound Data Page
+                    driver.get(inbound_page)
 
-                # Clear date input form
-                wait.until(
-                    EC.presence_of_element_located((By.NAME, 'P0_DATE1')))
-                date_from_input = driver.find_element(By.NAME, 'P0_DATE1')
-                date_from_input.clear()
-                wait.until(
-                    EC.presence_of_element_located((By.NAME, 'P0_DATE2')))
-                date_thru_input = driver.find_element(By.NAME, 'P0_DATE2')
-                date_thru_input.clear()
+                    # Change data type
+                    if self.mode == 2:
+                        wait.until(EC.presence_of_element_located(
+                            (By.NAME, 'P0_REP_DATE')))
+                        option_input = driver.find_element(
+                            By.NAME, 'P0_REP_DATE')
+                        option_input.send_keys('AWB')
 
-                # Input date
-                date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
-                date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    # Clear date input form
+                    wait.until(
+                        EC.presence_of_element_located((By.NAME, 'P0_DATE1')))
+                    date_from_input = driver.find_element(By.NAME, 'P0_DATE1')
+                    date_from_input.clear()
+                    wait.until(
+                        EC.presence_of_element_located((By.NAME, 'P0_DATE2')))
+                    date_thru_input = driver.find_element(By.NAME, 'P0_DATE2')
+                    date_thru_input.clear()
 
-                # Proceed
-                go_btn = wait.until(EC.presence_of_element_located(
-                    (By.ID, 'B12943525354637205515')))
-                go_btn.click()
+                    # Input date
+                    date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
 
-                # Wait until loading finished
-                time.sleep(10)
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH, '//*[@id="loadingIcon"]')
-                ))
-                time.sleep(10)
+                    # Proceed
+                    go_btn = wait.until(EC.presence_of_element_located(
+                        (By.ID, 'B12943525354637205515')))
+                    go_btn.click()
 
-                # Intracity data doesn't need to be generated
-                if self.mode < 2:
-                    # Wait data to be generated
-                    loading_img = [
-                        '//*[@id="report_R37362249766539564772"]/div/div[1]/table/tbody/tr/td[2]/button/img',
-                        '//*[@id="report_R29705817846763909733"]/div/div[1]/table/tbody/tr/td[2]/button/img'
-                    ]
+                    # Wait until loading finished
+                    time.sleep(10)
                     wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH, loading_img[self.mode])
+                        (By.XPATH, '//*[@id="loadingIcon"]')
                     ))
+                    time.sleep(10)
 
-                    # Refresh page after data generated
+                    # Intracity data doesn't need to be generated
+                    if self.mode < 2:
+                        # Wait data to be generated
+                        loading_img = [
+                            '//*[@id="report_R37362249766539564772"]/div/div[1]/table/tbody/tr/td[2]/button/img',
+                            '//*[@id="report_R29705817846763909733"]/div/div[1]/table/tbody/tr/td[2]/button/img'
+                        ]
+                        wait.until(EC.invisibility_of_element_located(
+                            (By.XPATH, loading_img[self.mode])
+                        ))
+
+                        # Refresh page after data generated
+                        time.sleep(5)
+                        driver.refresh()
+
+                    # Link to Result Page
+                    result_xpath = [
+                        '//*[@id="12887203838359850643_orig"]/tbody/tr[2]/td[3]/a',
+                        '//*[@id="12913870024091317880_orig"]/tbody/tr[2]/td[3]/a',
+                        '//*[@id="12859194002749946846_orig"]/tbody/tr[2]/td[1]/a',
+                    ]
+
+                    result_page = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, result_xpath[self.mode])))
+
+                    # Go to Result Page
+                    result_page.click()
                     time.sleep(5)
-                    driver.refresh()
 
-                # Link to Result Page
-                result_xpath = [
-                    '//*[@id="12887203838359850643_orig"]/tbody/tr[2]/td[3]/a',
-                    '//*[@id="12913870024091317880_orig"]/tbody/tr[2]/td[3]/a',
-                    '//*[@id="12859194002749946846_orig"]/tbody/tr[2]/td[1]/a',
-                ]
+                    # Start download proccess
+                    download_page = f"{base_link}:{page_code[self.mode][2]}:{session}:CSV::::"
+                    driver.get(download_page)
 
-                result_page = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, result_xpath[self.mode])))
+                    self.log.insert(
+                        tk.END, f"{datetime.now().strftime('%H:%M')} - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+                    self.log.see("end")
 
-                # Go to Result Page
-                result_page.click()
-                time.sleep(5)
+                    # Wait for file to be downloaded
+                    while not os.path.isfile(rf'{download_dir}\detail.csv'):
+                        time.sleep(15)
 
-                # Start download proccess
-                download_page = f"{base_link}:{page_code[self.mode][2]}:{session}:CSV::::"
-                driver.get(download_page)
+                    # Rename downloaded file
+                    default_filepath = rf'{download_dir}\detail.csv'
+                    if os.path.isfile(default_filepath):
+                        # Rename file
+                        renamed_file = rf'{download_dir}\{used_date.strftime("%d-%b-%Y")}.csv'
+                        os.rename(default_filepath, renamed_file)
 
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')} - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
-                self.log.see("end")
+                        # Verifiy date inside file
+                        column_header = [
+                            'MANIFEST INBOUND DATE', 'MANIFEST INBOUND DATE', 'CNOTE DATE']
+                        is_verified = check_file(
+                            file=renamed_file, current_date=used_date.date(), column_name=column_header[self.mode])
 
-                # Wait for file to be downloaded
-                while not os.path.isfile(rf'{download_dir}\detail.csv'):
-                    time.sleep(15)
+                        # Append file to list of downloaded file
+                        if is_verified:
+                            saved_files.append(renamed_file)
 
-                # Rename downloaded file
-                if os.path.isfile(rf'{download_dir}\detail.csv'):
-                    os.rename(rf'{download_dir}\detail.csv',
-                              rf'{download_dir}\{used_date.strftime("%d-%b-%Y")}.csv')
-                    saved_files.append(
-                        rf'{download_dir}\{used_date.strftime("%d-%b-%Y")}.csv')
-
-                # Change date
+                # Change date and go to next iteration
                 used_date += timedelta(days=1)
 
             # Close webdriver

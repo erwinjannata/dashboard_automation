@@ -159,27 +159,26 @@ def start_thread(event):
     show_password_apex.config(state='disabled')
     command_btn.state(['disabled'])
     setting_btn.state(['disabled'])
-    schedule_btn.state(['disabled'])
     root.after(5, check_thread_process)
 
 
 def close_thread():
     progressbar.stop()
     combo_box.state(['!disabled'])
-    apex_combo.state(['!disabled'])
     combine_check.config(state='normal')
     apex_check.config(state='normal')
     calendar_date_entry.state(['!disabled'])
     calendar_date_entry2.state(['!disabled'])
     username_entry.configure(state='normal')
     password_entry.configure(state='normal')
-    username_apex_entry.configure(state='normal')
-    password_apex_entry.configure(state='normal')
     show_password.config(state='normal')
     show_password_apex.config(state='normal')
     command_btn.state(['!disabled'])
     setting_btn.state(['!disabled'])
-    schedule_btn.state(['!disabled'])
+    if is_apex.get() == True:
+        apex_combo.state(['!disabled'])
+        username_apex_entry.configure(state='normal')
+        password_apex_entry.configure(state='normal')
 
 
 def check_thread_process():
@@ -348,31 +347,26 @@ command_btn = ttk.Button(root, text="Start",
                          command=lambda: start_thread(None), state=tk.NORMAL, width=26)
 command_btn.grid(row=13, column=2, pady=5, padx=5, sticky='e')
 
-# Schedule Button
-schedule_btn = ttk.Button(
-    root, text="Jadwalkan Apex", state=tk.NORMAL, width=26)
-schedule_btn.grid(row=13, column=0, pady=5, padx=5, sticky='e')
-
 # Setting Button
 setting_btn = ttk.Button(
     root, text="Pengaturan", command=lambda: open_setting(rootWindow=root), state=tk.NORMAL, width=26)
-setting_btn.grid(row=14, column=0, pady=5, padx=5, sticky='w')
+setting_btn.grid(row=13, column=0, pady=5, padx=5, sticky='w')
 
 # Open Directory Button
 open_dir_btn = ttk.Button(root, text="Folder Unduhan",
                           state=tk.NORMAL, width=26, command=lambda: open_directory())
-open_dir_btn.grid(row=15, column=0, pady=5, padx=5, sticky='w')
+open_dir_btn.grid(row=14, column=0, pady=5, padx=5, sticky='w')
 
 # Log Box
 log_label = tk.Label(root, text='Log', background='white', font='calibri 11 bold').grid(
     row=0, column=3, pady=5, padx=5, sticky='w')
-log_box = tkst.ScrolledText(root, width=50, height=18)
+log_box = tkst.ScrolledText(root, width=55, height=18)
 log_box.grid(row=1, column=3, pady=0,
-             padx=5, sticky='ns', rowspan=14)
+             padx=5, sticky='ns', rowspan=13)
 
 # Progress Bar
 progressbar = ttk.Progressbar(
-    root, mode='indeterminate', orient='horizontal', length=420)
-progressbar.grid(row=15, column=3, pady=5, padx=5, sticky='w')
+    root, mode='indeterminate', orient='horizontal', length=465)
+progressbar.grid(row=14, column=3, pady=5, padx=5, sticky='w')
 
 root.mainloop()

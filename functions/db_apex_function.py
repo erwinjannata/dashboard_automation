@@ -122,7 +122,7 @@ class ApexDB:
                 upload_btn.click()
 
                 # Wait until processed
-                time.sleep(30)
+                time.sleep(10)
                 wait.until(EC.presence_of_element_located(
                     (By.XPATH, '//*[@id="success-message"]')))
 

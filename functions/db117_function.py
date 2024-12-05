@@ -8,7 +8,7 @@ from datetime import timedelta, datetime
 from selenium.webdriver.common.by import By
 from functions.db_apex_function import ApexDB
 from selenium.webdriver.edge.service import Service
-from functions.general_function import combine_files
+from functions.general_function import combine_files, check_file
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
@@ -88,119 +88,131 @@ class DB117:
             inbound_page = f"{base_link}:56:{session}:::::"
 
             for i in range(0, self.loop):
-                # Go to Inbound Data Page
-                driver.get(inbound_page)
+                is_verified = False
 
-                # Select Regional Dropdown
-                regional_btn = wait.until(EC.presence_of_element_located(
-                    (By.ID, 'P56_REGIONAL_DEST_lov_btn')))
-                regional_btn.click()
+                # Verifiy data date before going into next iteration
+                while is_verified == False:
+                    # Go to Inbound Data Page
+                    driver.get(inbound_page)
 
-                jtbnn_link = wait.until(EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, '#PopupLov_56_P56_REGIONAL_DEST_dlg > div.a-PopupLOV-results.a-TMV > div > div.a-TMV-w-scroll > ul > li')))
-                jtbnn_link.click()
+                    # Select Regional Dropdown
+                    regional_btn = wait.until(EC.presence_of_element_located(
+                        (By.ID, 'P56_REGIONAL_DEST_lov_btn')))
+                    regional_btn.click()
 
-                # Select Branch Dropdown
-                branch_btn = wait.until(EC.presence_of_element_located(
-                    (By.ID, 'P56_BRANCH_DEST_lov_btn')))
-                branch_btn.click()
+                    jtbnn_link = wait.until(EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, '#PopupLov_56_P56_REGIONAL_DEST_dlg > div.a-PopupLOV-results.a-TMV > div > div.a-TMV-w-scroll > ul > li')))
+                    jtbnn_link.click()
 
-                branch_ami_link = wait.until(EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, '#PopupLov_56_P56_BRANCH_DEST_dlg > div.a-PopupLOV-results.a-TMV > div > div.a-TMV-w-scroll > ul > li')))
-                branch_ami_link.click()
+                    # Select Branch Dropdown
+                    branch_btn = wait.until(EC.presence_of_element_located(
+                        (By.ID, 'P56_BRANCH_DEST_lov_btn')))
+                    branch_btn.click()
 
-                # Clear date input form
-                wait.until(EC.presence_of_element_located(
-                    (By.NAME, 'P56_DATE1')))
-                date_from_input = driver.find_element(By.NAME, 'P56_DATE1')
-                date_from_input.clear()
+                    branch_ami_link = wait.until(EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, '#PopupLov_56_P56_BRANCH_DEST_dlg > div.a-PopupLOV-results.a-TMV > div > div.a-TMV-w-scroll > ul > li')))
+                    branch_ami_link.click()
 
-                wait.until(EC.presence_of_element_located(
-                    (By.NAME, 'P56_DATE2')))
-                date_thru_input = driver.find_element(By.NAME, 'P56_DATE2')
-                date_thru_input.clear()
+                    # Clear date input form
+                    wait.until(EC.presence_of_element_located(
+                        (By.NAME, 'P56_DATE1')))
+                    date_from_input = driver.find_element(By.NAME, 'P56_DATE1')
+                    date_from_input.clear()
 
-                # Input date
-                date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
-                date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    wait.until(EC.presence_of_element_located(
+                        (By.NAME, 'P56_DATE2')))
+                    date_thru_input = driver.find_element(By.NAME, 'P56_DATE2')
+                    date_thru_input.clear()
 
-                # Proceed
-                go_btn = wait.until(EC.presence_of_element_located(
-                    (By.ID, 'B4053153599493451337')))
-                go_btn.click()
+                    # Input date
+                    date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
 
-                # Wait data to be generated
-                time.sleep(10)
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH,
-                     '//*[@id="report_R4053268519926012741"]/div/div[1]/table/tbody/tr/td[2]/button/img')
-                ))
+                    # Proceed
+                    go_btn = wait.until(EC.presence_of_element_located(
+                        (By.ID, 'B4053153599493451337')))
+                    go_btn.click()
 
-                # Refresh page after data generated
-                time.sleep(5)
-                driver.refresh()
+                    # Wait data to be generated
+                    time.sleep(10)
+                    wait.until(EC.invisibility_of_element_located(
+                        (By.XPATH,
+                         '//*[@id="report_R4053268519926012741"]/div/div[1]/table/tbody/tr/td[2]/button/img')
+                    ))
 
-                # Go into HAWB Page
-                hawb_link = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="report_INB"]/div/div[1]/table/tbody/tr/td[6]/a')))
-                hawb_link.click()
+                    # Refresh page after data generated
+                    time.sleep(5)
+                    driver.refresh()
 
-                # Remove filter
-                close_btn = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
-                close_btn.click()
+                    # Go into HAWB Page
+                    hawb_link = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="report_INB"]/div/div[1]/table/tbody/tr/td[6]/a')))
+                    hawb_link.click()
 
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
+                    # Remove filter
+                    close_btn = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
+                    close_btn.click()
 
-                # Wait table data to be displayed
-                wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="C4053326991647201295"]/a')))
+                    wait.until(EC.invisibility_of_element_located(
+                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
 
-                # Locate download option
-                inbound_action_btn = wait.until(
-                    EC.presence_of_element_located((By.ID, 'INB_actions_button')))
-                inbound_action_btn.click()
+                    # Wait table data to be displayed
+                    wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="C4053326991647201295"]/a')))
 
-                # Open download option
-                download_menu = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="INB_actions_menu_14i"]')))
-                download_menu.click()
+                    # Locate download option
+                    inbound_action_btn = wait.until(
+                        EC.presence_of_element_located((By.ID, 'INB_actions_button')))
+                    inbound_action_btn.click()
 
-                # Select Excel data format
-                excel_btn = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="INB_download_formats"]/li[3]')))
-                excel_btn.click()
+                    # Open download option
+                    download_menu = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="INB_actions_menu_14i"]')))
+                    download_menu.click()
 
-                # Select to download data only
-                data_only = wait.until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="INB_download_options"]/div[2]/div[1]/div/div[2]/label/span')))
-                data_only.click()
+                    # Select Excel data format
+                    excel_btn = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="INB_download_formats"]/li[3]')))
+                    excel_btn.click()
 
-                # Proceed to download
-                download_btn = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="t_PageBody"]/div[5]/div[3]/div/button[2]')))
-                download_btn.click()
+                    # Select to download data only
+                    data_only = wait.until(
+                        EC.presence_of_element_located((By.XPATH, '//*[@id="INB_download_options"]/div[2]/div[1]/div/div[2]/label/span')))
+                    data_only.click()
 
-                # Record download timestamp
-                download_time = datetime.now()
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')}  - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
-                self.log.see("end")
+                    # Proceed to download
+                    download_btn = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="t_PageBody"]/div[5]/div[3]/div/button[2]')))
+                    download_btn.click()
 
-                # Wait for file to be downloaded, if in 5 minutes files not detected try to download again
-                while not os.path.isfile(rf"{self.working_dir}\{self.penarikan}\Inbound .xlsx"):
-                    time.sleep(15)
-                    if datetime.now() - download_time > timedelta(minutes=5):
-                        download_btn.click()
-                        download_time = datetime.now()
+                    # Record download timestamp
+                    download_time = datetime.now()
+                    self.log.insert(
+                        tk.END, f"{datetime.now().strftime('%H:%M')}  - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+                    self.log.see("end")
 
-                # Rename downloaded file
-                if os.path.isfile(rf"{self.working_dir}\{self.penarikan}\Inbound .xlsx"):
-                    os.rename(rf"{self.working_dir}\{self.penarikan}\Inbound .xlsx",
-                              rf"{self.working_dir}\{self.penarikan}\{used_date.strftime('%d-%b-%Y')}.xlsx")
-                    saved_files.append(
-                        rf"{self.working_dir}\{self.penarikan}\{used_date.strftime('%d-%b-%Y')}.xlsx")
+                    # Wait for file to be downloaded, if in 5 minutes files not detected try to download again
+                    while not os.path.isfile(rf"{self.working_dir}\{self.penarikan}\Inbound .xlsx"):
+                        time.sleep(15)
+                        if datetime.now() - download_time > timedelta(minutes=5):
+                            download_btn.click()
+                            download_time = datetime.now()
+
+                    # Rename downloaded file
+                    default_filepath = rf"{self.working_dir}\{self.penarikan}\Inbound .xlsx"
+                    if os.path.isfile(default_filepath):
+                        # Rename file
+                        renamed_file = rf"{self.working_dir}\{self.penarikan}\{used_date.strftime('%d-%b-%Y')}.xlsx"
+                        os.rename(default_filepath, renamed_file)
+
+                        # Verifiy data date
+                        is_verified = check_file(
+                            file=renamed_file, current_date=used_date.date(), column_name='Manifest Inbound Date')
+
+                        # Append file to list of downloaded file
+                        if is_verified:
+                            saved_files.append(renamed_file)
 
                 # Change date
                 used_date += timedelta(days=1)
@@ -302,117 +314,129 @@ class DB117:
             outbound_page = f"{base_link}:53:{session}:::::"
 
             for i in range(0, self.loop):
-                # Go to Outbound Data Page
-                driver.get(outbound_page)
+                is_verified = False
 
-                # Select Regional dropdown
-                regional_btn = wait.until(EC.presence_of_element_located(
-                    (By.ID, 'P53_REGIONAL')))
-                regional_btn.send_keys('JTBNN')
-                wait.until(EC.text_to_be_present_in_element(
-                    (By.ID, 'P53_REGIONAL'), 'JTBNN'))
+                # Verify datas date before proceeding to next iteration
+                while is_verified == False:
+                    # Go to Outbound Data Page
+                    driver.get(outbound_page)
 
-                # Select Branch dropdown
-                branch_btn = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="P53_BRANCH"]/option[2]')))
-                branch_btn.click()
+                    # Select Regional dropdown
+                    regional_btn = wait.until(EC.presence_of_element_located(
+                        (By.ID, 'P53_REGIONAL')))
+                    regional_btn.send_keys('JTBNN')
+                    wait.until(EC.text_to_be_present_in_element(
+                        (By.ID, 'P53_REGIONAL'), 'JTBNN'))
 
-                # Clear date input form
-                wait.until(EC.presence_of_element_located(
-                    (By.NAME, 'P53_DATE1')))
-                date_from_input = driver.find_element(By.NAME, 'P53_DATE1')
-                date_from_input.clear()
+                    # Select Branch dropdown
+                    branch_btn = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="P53_BRANCH"]/option[2]')))
+                    branch_btn.click()
 
-                wait.until(EC.presence_of_element_located(
-                    (By.NAME, 'P53_DATE2')))
-                date_thru_input = driver.find_element(By.NAME, 'P53_DATE2')
-                date_thru_input.clear()
+                    # Clear date input form
+                    wait.until(EC.presence_of_element_located(
+                        (By.NAME, 'P53_DATE1')))
+                    date_from_input = driver.find_element(By.NAME, 'P53_DATE1')
+                    date_from_input.clear()
 
-                # Input date
-                date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
-                date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    wait.until(EC.presence_of_element_located(
+                        (By.NAME, 'P53_DATE2')))
+                    date_thru_input = driver.find_element(By.NAME, 'P53_DATE2')
+                    date_thru_input.clear()
 
-                # Proceed
-                go_btn = wait.until(EC.presence_of_element_located(
-                    (By.ID, 'B4017712943882114109')))
-                go_btn.click()
+                    # Input date
+                    date_from_input.send_keys(used_date.strftime('%d-%b-%Y'))
+                    date_thru_input.send_keys(used_date.strftime('%d-%b-%Y'))
 
-                # Wait data to be generated
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH, '//*[@id="loadingIcon"]')
-                ))
-                time.sleep(10)
+                    # Proceed
+                    go_btn = wait.until(EC.presence_of_element_located(
+                        (By.ID, 'B4017712943882114109')))
+                    go_btn.click()
 
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH, '//*[@id="report_R4933984207213937247"]/div/div[1]/table/tbody/tr/td[2]/button/img')))
-                time.sleep(5)
+                    # Wait data to be generated
+                    wait.until(EC.invisibility_of_element_located(
+                        (By.XPATH, '//*[@id="loadingIcon"]')
+                    ))
+                    time.sleep(10)
 
-                # Refresh after data generated
-                driver.refresh()
-                wait.until(EC.visibility_of_element_located(
-                    (By.XPATH, '//*[@id="report_R4017713448924114114"]/div/div[1]/table/tbody/tr/td[1]/a')))
+                    wait.until(EC.invisibility_of_element_located(
+                        (By.XPATH, '//*[@id="report_R4933984207213937247"]/div/div[1]/table/tbody/tr/td[2]/button/img')))
+                    time.sleep(5)
 
-                # Go into HAWB Page
-                result_link = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="report_R4017713448924114114"]/div/div[1]/table/tbody/tr/td[1]/a')))
-                result_link.click()
+                    # Refresh after data generated
+                    driver.refresh()
+                    wait.until(EC.visibility_of_element_located(
+                        (By.XPATH, '//*[@id="report_R4017713448924114114"]/div/div[1]/table/tbody/tr/td[1]/a')))
 
-                # Remove Shipment Type : Domestic
-                remove_button = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
-                remove_button.click()
+                    # Go into HAWB Page
+                    result_link = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="report_R4017713448924114114"]/div/div[1]/table/tbody/tr/td[1]/a')))
+                    result_link.click()
 
-                wait.until(EC.invisibility_of_element_located(
-                    (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
+                    # Remove Shipment Type : Domestic
+                    remove_button = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
+                    remove_button.click()
 
-                # Wait table data to be displayed
-                wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="C880827517533491326"]/a')))
+                    wait.until(EC.invisibility_of_element_located(
+                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
 
-                # Locate download button
-                inbound_action_btn = wait.until(
-                    EC.presence_of_element_located((By.ID, 'INB_actions_button')))
-                inbound_action_btn.click()
+                    # Wait table data to be displayed
+                    wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="C880827517533491326"]/a')))
 
-                # Open download menu
-                download_menu = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="INB_actions_menu_14i"]')))
-                download_menu.click()
+                    # Locate download button
+                    inbound_action_btn = wait.until(
+                        EC.presence_of_element_located((By.ID, 'INB_actions_button')))
+                    inbound_action_btn.click()
 
-                # Select data file extension
-                excel_btn = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="INB_download_formats"]/li[3]')))
-                excel_btn.click()
+                    # Open download menu
+                    download_menu = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="INB_actions_menu_14i"]')))
+                    download_menu.click()
 
-                # Select to download data only
-                data_only = wait.until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="INB_download_options"]/div[2]/div[1]/div/div[2]/label/span')))
-                data_only.click()
+                    # Select data file extension
+                    excel_btn = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="INB_download_formats"]/li[3]')))
+                    excel_btn.click()
 
-                # Proceed to download
-                download_btn = wait.until(EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="t_PageBody"]/div[5]/div[3]/div/button[2]')))
-                download_btn.click()
+                    # Select to download data only
+                    data_only = wait.until(
+                        EC.presence_of_element_located((By.XPATH, '//*[@id="INB_download_options"]/div[2]/div[1]/div/div[2]/label/span')))
+                    data_only.click()
 
-                # Record the download timestamp
-                download_time = datetime.now()
-                self.log.insert(
-                    tk.END, f"{datetime.now().strftime('%H:%M')}  - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
-                self.log.see("end")
+                    # Proceed to download
+                    download_btn = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="t_PageBody"]/div[5]/div[3]/div/button[2]')))
+                    download_btn.click()
 
-                # Wait for file to be downloaded, if in 5 minutes files not detected try to download again
-                while not os.path.isfile(rf"{self.working_dir}\{self.penarikan}\Origin.xlsx"):
-                    time.sleep(15)
-                    if datetime.now() - download_time > timedelta(minutes=5):
-                        download_btn.click()
-                        download_time = datetime.now()
+                    # Record the download timestamp
+                    download_time = datetime.now()
+                    self.log.insert(
+                        tk.END, f"{datetime.now().strftime('%H:%M')}  - Downloading data {used_date.strftime('%d-%b-%Y')} \n")
+                    self.log.see("end")
 
-                # Rename downloaded file
-                if os.path.isfile(rf"{self.working_dir}\{self.penarikan}\Origin.xlsx"):
-                    os.rename(rf"{self.working_dir}\{self.penarikan}\Origin.xlsx",
-                              rf"{self.working_dir}\{self.penarikan}\{used_date.strftime('%d-%b-%Y')}.xlsx")
-                    saved_files.append(
-                        rf"{self.working_dir}\{self.penarikan}\{used_date.strftime('%d-%b-%Y')}.xlsx")
+                    # Wait for file to be downloaded, if in 5 minutes files not detected try to download again
+                    while not os.path.isfile(rf"{self.working_dir}\{self.penarikan}\Origin.xlsx"):
+                        time.sleep(15)
+                        if datetime.now() - download_time > timedelta(minutes=5):
+                            download_btn.click()
+                            download_time = datetime.now()
+
+                    # Rename downloaded file
+                    default_filepath = rf"{self.working_dir}\{self.penarikan}\Origin.xlsx"
+                    if os.path.isfile(default_filepath):
+                        # Rename file
+                        renamed_file = rf"{self.working_dir}\{self.penarikan}\{used_date.strftime('%d-%b-%Y')}.xlsx"
+                        os.rename(default_filepath, renamed_file)
+
+                        # Verifiy data date
+                        is_verified = check_file(
+                            file=renamed_file, current_date=used_date.date(), column_name='Cnote Date')
+
+                        # Append file to list of downloaded file
+                        if is_verified:
+                            saved_files.append(renamed_file)
 
                 # Change date
                 used_date += timedelta(days=1)

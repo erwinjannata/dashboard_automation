@@ -1,9 +1,36 @@
 import os
+import gc
 import sys
+import datetime
 import pandas as pd
 import xlwings as xl
 from tkinter import filedialog
 from tkinter.messagebox import showinfo
+
+
+def check_file(file, current_date, column_name):
+    filename, file_extension = os.path.splitext(file)
+    global df
+
+    if file_extension == ".xlsx":
+        df = pd.read_excel(file, usecols=[column_name], nrows=1)
+    else:
+        df = pd.read_csv(
+            file, usecols=[column_name], nrows=1, encoding='iso-8859-1')
+
+    data_date = df.at[0, column_name]
+    data_date = datetime.datetime.strptime(
+        data_date, '%d-%b-%Y %H:%M').date()
+
+    if data_date == current_date:
+        del df
+        gc.collect()
+        return True
+    else:
+        os.remove(file)
+        del df
+        gc.collect()
+        return False
 
 
 def combine_files(files, start_date, end_date, is_standalone):
