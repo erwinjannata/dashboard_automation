@@ -10,17 +10,19 @@ from tkinter.messagebox import showinfo
 
 def check_file(file, current_date, column_name):
     filename, file_extension = os.path.splitext(file)
-    global df
+    global df, data_date
 
     if file_extension == ".xlsx":
         df = pd.read_excel(file, usecols=[column_name], nrows=1)
+        date_date = str(df.at[0, column_name])
+        data_date = datetime.datetime.strptime(
+            date_date, '%Y-%m-%d %H:%M:%S').date()
     else:
         df = pd.read_csv(
             file, usecols=[column_name], nrows=1, encoding='iso-8859-1')
-
-    data_date = df.at[0, column_name]
-    data_date = datetime.datetime.strptime(
-        data_date, '%d-%b-%Y %H:%M').date()
+        date_date = df.at[0, column_name]
+        data_date = datetime.datetime.strptime(
+            date_date, '%d-%b-%Y %H:%M').date()
 
     if data_date == current_date:
         del df

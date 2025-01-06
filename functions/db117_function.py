@@ -63,11 +63,11 @@ class DB117:
 
             # Login
             username_form = wait.until(
-                EC.presence_of_element_located((By.ID, 'P101_USERNAME')))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#P101_USERNAME')))
             password_form = wait.until(
-                EC.presence_of_element_located((By.ID, 'P101_PASSWORD')))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#P101_PASSWORD')))
             login_button = wait.until(
-                EC.presence_of_element_located((By.ID, 'B3779048980085325187')))
+                EC.presence_of_element_located((By.XPATH, '/html/body/form/div/div/div/div/div/div/div/div/div[3]/button')))
 
             username_form.send_keys(self.username_db)
             password_form.send_keys(self.password_db)
@@ -130,14 +130,14 @@ class DB117:
 
                     # Proceed
                     go_btn = wait.until(EC.presence_of_element_located(
-                        (By.ID, 'B4053153599493451337')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/div/div/div[1]/div/div/div[2]/div[1]/div/div[1]/div/div/div[1]/div/button')))
                     go_btn.click()
 
                     # Wait data to be generated
                     time.sleep(10)
                     wait.until(EC.invisibility_of_element_located(
                         (By.XPATH,
-                         '//*[@id="report_R4053268519926012741"]/div/div[1]/table/tbody/tr/td[2]/button/img')
+                         '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/div/div/div[1]/div/div/div[2]/div[1]/div/div[2]/div/div[2]/div[2]/div/div/div/div[1]/table/tbody/tr/td[2]/button')
                     ))
 
                     # Refresh page after data generated
@@ -150,16 +150,14 @@ class DB117:
                     hawb_link.click()
 
                     # Remove filter
-                    close_btn = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
-                    close_btn.click()
-
-                    wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
+                    filter_checkbox = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[2]/div[2]/ul/li/span[1]/input')))
+                    filter_checkbox.click()
+                    time.sleep(5)
 
                     # Wait table data to be displayed
                     wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="C4053326991647201295"]/a')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[6]/div[1]/div/div[1]/table/tr/th[1]/a')))
 
                     # Locate download option
                     inbound_action_btn = wait.until(
@@ -168,22 +166,17 @@ class DB117:
 
                     # Open download option
                     download_menu = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="INB_actions_menu_14i"]')))
+                        (By.XPATH, '/html/body/div[3]/div/ul/li[14]/div/span[1]/button')))
                     download_menu.click()
 
                     # Select Excel data format
                     excel_btn = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="INB_download_formats"]/li[3]')))
+                        (By.XPATH, '/html/body/div[5]/div[2]/div/ul/li[3]')))
                     excel_btn.click()
-
-                    # Select to download data only
-                    data_only = wait.until(
-                        EC.presence_of_element_located((By.XPATH, '//*[@id="INB_download_options"]/div[2]/div[1]/div/div[2]/label/span')))
-                    data_only.click()
 
                     # Proceed to download
                     download_btn = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="t_PageBody"]/div[5]/div[3]/div/button[2]')))
+                        (By.XPATH, '/html/body/div[5]/div[3]/div/button[2]')))
                     download_btn.click()
 
                     # Record download timestamp
@@ -293,7 +286,7 @@ class DB117:
             password_form = wait.until(
                 EC.presence_of_element_located((By.ID, 'P101_PASSWORD')))
             login_button = wait.until(
-                EC.presence_of_element_located((By.ID, 'B3779048980085325187')))
+                EC.presence_of_element_located((By.XPATH, '/html/body/form/div/div/div/div/div/div/div/div/div[3]/button')))
 
             username_form.send_keys(self.username_db)
             password_form.send_keys(self.password_db)
@@ -350,7 +343,7 @@ class DB117:
 
                     # Proceed
                     go_btn = wait.until(EC.presence_of_element_located(
-                        (By.ID, 'B4017712943882114109')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[1]/div/div/div/div[3]/div/button')))
                     go_btn.click()
 
                     # Wait data to be generated
@@ -360,30 +353,26 @@ class DB117:
                     time.sleep(10)
 
                     wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH, '//*[@id="report_R4933984207213937247"]/div/div[1]/table/tbody/tr/td[2]/button/img')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div/div[2]/div[1]/div/div[1]/div/div[2]/div[2]/div/div/div/div[1]/table/tbody/tr/td[2]/button')))
                     time.sleep(5)
 
                     # Refresh after data generated
                     driver.refresh()
-                    wait.until(EC.visibility_of_element_located(
-                        (By.XPATH, '//*[@id="report_R4017713448924114114"]/div/div[1]/table/tbody/tr/td[1]/a')))
 
                     # Go into HAWB Page
                     result_link = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="report_R4017713448924114114"]/div/div[1]/table/tbody/tr/td[1]/a')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[3]/div/div/div[2]/div[2]/div/div/div/div[1]/table/tbody/tr/td[1]/a')))
                     result_link.click()
 
                     # Remove Shipment Type : Domestic
-                    remove_button = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
-                    remove_button.click()
-
-                    wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH, '//*[@id="a_Collapsible1_INB_control_panel_content"]/ul/li/span[4]/button')))
+                    filter_checkbox = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[2]/div[2]/ul/li/span[1]/input')))
+                    filter_checkbox.click()
+                    time.sleep(5)
 
                     # Wait table data to be displayed
                     wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="C880827517533491326"]/a')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[6]/div[1]/div/div[1]/table/tr/th[1]/a')))
 
                     # Locate download button
                     inbound_action_btn = wait.until(
@@ -399,11 +388,6 @@ class DB117:
                     excel_btn = wait.until(EC.presence_of_element_located(
                         (By.XPATH, '//*[@id="INB_download_formats"]/li[3]')))
                     excel_btn.click()
-
-                    # Select to download data only
-                    data_only = wait.until(
-                        EC.presence_of_element_located((By.XPATH, '//*[@id="INB_download_options"]/div[2]/div[1]/div/div[2]/label/span')))
-                    data_only.click()
 
                     # Proceed to download
                     download_btn = wait.until(EC.presence_of_element_located(

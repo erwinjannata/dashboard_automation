@@ -17,7 +17,7 @@ from functions.db_apex_function import ApexDB
 # Interface configuration
 root = tk.Tk()
 root.configure(bg='white')
-root.title('JNE AMI Dashboard Automation v.2.0')
+root.title('JNE AMI Dashboard Automation v.2.1')
 root.resizable(0, 0)
 
 # Variables
