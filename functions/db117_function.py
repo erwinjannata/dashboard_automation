@@ -61,13 +61,15 @@ class DB117:
             # Read first date, Ascending order
             used_date = self.date_from
 
+            time.sleep(5)
+
             # Login
             username_form = wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#P101_USERNAME')))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#P1011_USERNAME')))
             password_form = wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#P101_PASSWORD')))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#P1011_PASSWORD')))
             login_button = wait.until(
-                EC.presence_of_element_located((By.XPATH, '/html/body/form/div/div/div/div/div/div/div/div/div[3]/button')))
+                EC.presence_of_element_located((By.XPATH, '/html/body/form/div[2]/main/div/div/div/div/div[3]/button')))
 
             username_form.send_keys(self.username_db)
             password_form.send_keys(self.password_db)
@@ -79,13 +81,11 @@ class DB117:
 
             # Read current page information
             current_url = driver.current_url
-            url_parts = current_url.split(":")
-
-            current_page = url_parts[3]
-            session = url_parts[4]
+            url_parts = current_url.split("=")
+            user_session = url_parts[1]
 
             # Inbound Data Page URL
-            inbound_page = f"{base_link}:56:{session}:::::"
+            inbound_page = f"{base_link}/56?session={user_session}"
 
             for i in range(0, self.loop):
                 is_verified = False
@@ -97,31 +97,29 @@ class DB117:
 
                     # Select Regional Dropdown
                     regional_btn = wait.until(EC.presence_of_element_located(
-                        (By.ID, 'P56_REGIONAL_DEST_lov_btn')))
+                        (By.XPATH, '//*[@id="P56_REGIONAL_DEST_lov_btn"]')))
                     regional_btn.click()
 
                     jtbnn_link = wait.until(EC.presence_of_element_located(
-                        (By.CSS_SELECTOR, '#PopupLov_56_P56_REGIONAL_DEST_dlg > div.a-PopupLOV-results.a-TMV > div > div.a-TMV-w-scroll > ul > li')))
+                        (By.XPATH, '//*[@id="PopupLov_56_P56_REGIONAL_DEST_dlg"]/div[2]/div/div[3]/ul/li')))
                     jtbnn_link.click()
 
                     # Select Branch Dropdown
                     branch_btn = wait.until(EC.presence_of_element_located(
-                        (By.ID, 'P56_BRANCH_DEST_lov_btn')))
+                        (By.XPATH, '//*[@id="P56_BRANCH_DEST_lov_btn"]')))
                     branch_btn.click()
 
                     branch_ami_link = wait.until(EC.presence_of_element_located(
-                        (By.CSS_SELECTOR, '#PopupLov_56_P56_BRANCH_DEST_dlg > div.a-PopupLOV-results.a-TMV > div > div.a-TMV-w-scroll > ul > li')))
+                        (By.XPATH, '//*[@id="PopupLov_56_P56_BRANCH_DEST_dlg"]/div[2]/div/div[3]/ul/li')))
                     branch_ami_link.click()
 
                     # Clear date input form
-                    wait.until(EC.presence_of_element_located(
-                        (By.NAME, 'P56_DATE1')))
-                    date_from_input = driver.find_element(By.NAME, 'P56_DATE1')
+                    date_from_input = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="P56_DATE1"]')))
                     date_from_input.clear()
 
-                    wait.until(EC.presence_of_element_located(
-                        (By.NAME, 'P56_DATE2')))
-                    date_thru_input = driver.find_element(By.NAME, 'P56_DATE2')
+                    date_thru_input = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="P56_DATE2"]')))
                     date_thru_input.clear()
 
                     # Input date
@@ -130,14 +128,14 @@ class DB117:
 
                     # Proceed
                     go_btn = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/div/div/div[1]/div/div/div[2]/div[1]/div/div[1]/div/div/div[1]/div/button')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div/div/div/div/div[1]/div/div/div[2]/div[2]/div/div[1]/div/div/div[1]/div/button')))
                     go_btn.click()
 
                     # Wait data to be generated
                     time.sleep(10)
                     wait.until(EC.invisibility_of_element_located(
                         (By.XPATH,
-                         '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div/div/div/div/div[1]/div/div/div[2]/div[1]/div/div[2]/div/div[2]/div[2]/div/div/div/div[1]/table/tbody/tr/td[2]/button')
+                         '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div/div/div/div/div[1]/div/div/div[2]/div[2]/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[1]/table/tbody/tr/td[2]/button')
                     ))
 
                     # Refresh page after data generated
@@ -146,25 +144,25 @@ class DB117:
 
                     # Go into HAWB Page
                     hawb_link = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="report_INB"]/div/div[1]/table/tbody/tr/td[6]/a')))
+                        (By.XPATH, '//*[@id="report_table_INB"]/tbody/tr/td[6]/a')))
                     hawb_link.click()
 
                     # Remove filter
                     filter_checkbox = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[2]/div[2]/ul/li/span[1]/input')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div[2]/div[2]/div[2]/ul/li/span[1]/input')))
                     filter_checkbox.click()
                     time.sleep(5)
 
                     # Wait table data to be displayed
                     wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[6]/div[1]/div/div[1]/table/tr/th[1]/a')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div[2]/div[2]/div[6]/div[1]/div/div[1]/table/tr/th[1]/a')))
 
-                    # Locate download option
+                    # Open Action Dropdown
                     inbound_action_btn = wait.until(
                         EC.presence_of_element_located((By.ID, 'INB_actions_button')))
                     inbound_action_btn.click()
 
-                    # Open download option
+                    # Open download menu
                     download_menu = wait.until(EC.presence_of_element_located(
                         (By.XPATH, '/html/body/div[3]/div/ul/li[14]/div/span[1]/button')))
                     download_menu.click()
@@ -280,13 +278,16 @@ class DB117:
             # Read first date, Ascending order
             used_date = self.date_from
 
+            # There's particular reason for this
+            time.sleep(5)
+
             # Login
             username_form = wait.until(
-                EC.presence_of_element_located((By.ID, 'P101_USERNAME')))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#P1011_USERNAME')))
             password_form = wait.until(
-                EC.presence_of_element_located((By.ID, 'P101_PASSWORD')))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#P1011_PASSWORD')))
             login_button = wait.until(
-                EC.presence_of_element_located((By.XPATH, '/html/body/form/div/div/div/div/div/div/div/div/div[3]/button')))
+                EC.presence_of_element_located((By.XPATH, '/html/body/form/div[2]/main/div/div/div/div/div[3]/button')))
 
             username_form.send_keys(self.username_db)
             password_form.send_keys(self.password_db)
@@ -298,13 +299,11 @@ class DB117:
 
             # Read current page Information
             current_url = driver.current_url
-            url_parts = current_url.split(":")
-
-            current_page = url_parts[3]
-            session = url_parts[4]
+            url_parts = current_url.split("=")
+            user_session = url_parts[1]
 
             # Outbound Data Page URL
-            outbound_page = f"{base_link}:53:{session}:::::"
+            outbound_page = f"{base_link}/53?session={user_session}"
 
             for i in range(0, self.loop):
                 is_verified = False
@@ -315,26 +314,24 @@ class DB117:
                     driver.get(outbound_page)
 
                     # Select Regional dropdown
-                    regional_btn = wait.until(EC.presence_of_element_located(
-                        (By.ID, 'P53_REGIONAL')))
-                    regional_btn.send_keys('JTBNN')
+                    regional_dropdown = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="P53_REGIONAL"]')))
+                    regional_dropdown.send_keys('JTBNN')
                     wait.until(EC.text_to_be_present_in_element(
-                        (By.ID, 'P53_REGIONAL'), 'JTBNN'))
+                        (By.XPATH, '//*[@id="P53_REGIONAL"]'), 'JTBNN'))
 
                     # Select Branch dropdown
-                    branch_btn = wait.until(EC.presence_of_element_located(
+                    branch_dropdown = wait.until(EC.presence_of_element_located(
                         (By.XPATH, '//*[@id="P53_BRANCH"]/option[2]')))
-                    branch_btn.click()
+                    branch_dropdown.click()
 
                     # Clear date input form
-                    wait.until(EC.presence_of_element_located(
-                        (By.NAME, 'P53_DATE1')))
-                    date_from_input = driver.find_element(By.NAME, 'P53_DATE1')
+                    date_from_input = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="P53_DATE1"]')))
                     date_from_input.clear()
 
-                    wait.until(EC.presence_of_element_located(
-                        (By.NAME, 'P53_DATE2')))
-                    date_thru_input = driver.find_element(By.NAME, 'P53_DATE2')
+                    date_thru_input = wait.until(EC.presence_of_element_located(
+                        (By.XPATH, '//*[@id="P53_DATE2"]')))
                     date_thru_input.clear()
 
                     # Input date
@@ -343,17 +340,13 @@ class DB117:
 
                     # Proceed
                     go_btn = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[1]/div/div/div/div[3]/div/button')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[1]/div/div/div/div[3]/div/button')))
                     go_btn.click()
 
                     # Wait data to be generated
                     wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH, '//*[@id="loadingIcon"]')
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/div[2]/div[2]/div[2]/div/div/div[1]/table/tbody/tr/td[2]/button')
                     ))
-                    time.sleep(10)
-
-                    wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[2]/div/div/div/div[2]/div[1]/div/div[1]/div/div[2]/div[2]/div/div/div/div[1]/table/tbody/tr/td[2]/button')))
                     time.sleep(5)
 
                     # Refresh after data generated
@@ -361,37 +354,37 @@ class DB117:
 
                     # Go into HAWB Page
                     result_link = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div[3]/div/div/div[2]/div[2]/div/div/div/div[1]/table/tbody/tr/td[1]/a')))
+                        (By.XPATH, '//*[@id="report_table_R4022421634176267448"]/tbody/tr/td[1]/a')))
                     result_link.click()
 
                     # Remove Shipment Type : Domestic
                     filter_checkbox = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[2]/div[2]/ul/li/span[1]/input')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div/div/div/div[2]/div[2]/div[2]/div/div[2]/div[2]/div[2]/div[2]/ul/li/span[1]/input')))
                     filter_checkbox.click()
                     time.sleep(5)
 
                     # Wait table data to be displayed
                     wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[6]/div[1]/div/div[1]/table/tr/th[1]/a')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div/div/div/div[2]/div[2]/div[2]/div/div[2]/div[2]/div[6]/div[1]/div/div[1]/table/tr/th[1]/a')))
 
-                    # Locate download button
+                    # Open Action Dropdown
                     inbound_action_btn = wait.until(
                         EC.presence_of_element_located((By.ID, 'INB_actions_button')))
                     inbound_action_btn.click()
 
                     # Open download menu
                     download_menu = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="INB_actions_menu_14i"]')))
+                        (By.XPATH, '/html/body/div[3]/div/ul/li[14]/div/span[1]/button')))
                     download_menu.click()
 
                     # Select data file extension
                     excel_btn = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="INB_download_formats"]/li[3]')))
+                        (By.XPATH, '/html/body/div[5]/div[2]/div/ul/li[3]')))
                     excel_btn.click()
 
                     # Proceed to download
                     download_btn = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="t_PageBody"]/div[5]/div[3]/div/button[2]')))
+                        (By.XPATH, '/html/body/div[5]/div[3]/div/button[2]')))
                     download_btn.click()
 
                     # Record the download timestamp
