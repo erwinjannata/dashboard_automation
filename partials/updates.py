@@ -27,7 +27,9 @@ def check_update_function(log_box, close_thread):
     if current_version == latest_version:
         showinfo(title="Info",
                  message="Versi aplikasi sudah terbaru")
+        close_thread()
     elif latest_version == None:
+        close_thread()
         return None
     else:
         log_box.insert(
@@ -38,6 +40,11 @@ def check_update_function(log_box, close_thread):
             "REPO_BRANCH"), file_path=os.getenv("FILE_PATH_PACKAGES"), access_token=os.getenv("ACCESS_TOKEN"), log_box=log_box)
 
         if is_update_done:
+            # Delete old Manual Book, if exist
+            if os.path.exists(rf"{Path.cwd()}\Manual Book Automasi Dashboard JNE AMI.pdf"):
+                os.remove(
+                    rf"{Path.cwd()}\Manual Book Automasi Dashboard JNE AMI.pdf")
+
             # Unzip update package
             with zipfile.ZipFile(rf"{Path.cwd()}\app.zip", 'r') as zip_ref:
                 log_box.insert(
@@ -54,10 +61,9 @@ def check_update_function(log_box, close_thread):
                     tk.END, f"{datetime.now().strftime('%H:%M')} - Completing update... \n")
                 log_box.see("end")
             showinfo(title="Info",
-                     message="Versi terbaru berhasil diunduh, aplikasi akan ditutup")
+                     message="Versi terbaru berhasil diunduh, silahkan gunakan aplikasi versi terbaru")
             close_thread()
 
             # Delete unused package
-            if os.path.exists({Path.cwd()}):
+            if os.path.exists(Path.cwd()):
                 os.remove(rf"{Path.cwd()}\app.zip")
-                os.remove(rf"{Path.cwd()}\{os.path.basename(sys.executable)}")

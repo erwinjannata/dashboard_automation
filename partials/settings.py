@@ -96,11 +96,6 @@ def open_setting(rootWindow):
     entry_apex16.grid(row=5, column=2, pady=5, padx=5,
                       sticky='w', columnspan=2)
 
-    # Check for update button
-    update_btn = ttk.Button(
-        new_window, text="Update aplikasi", state=tk.NORMAL, width=15)
-    update_btn.grid(row=6, column=0, pady=5, padx=5, sticky='w')
-
     # Save Button
     save_btn = ttk.Button(new_window, text="Simpan",
                           state=tk.NORMAL, width=10, command=lambda: save())

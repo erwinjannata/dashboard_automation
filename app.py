@@ -406,7 +406,6 @@ if __name__ == "__main__":
     menu_bar.add_cascade(label="Help", menu=help)
     help.add_command(label='Periksa Update',
                      command=lambda: start_update_thread(None))
-    help.add_command(label='Manual Book', command=lambda: open_directory())
 
     root.config(menu=menu_bar)
     root.mainloop()
