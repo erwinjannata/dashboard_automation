@@ -2,8 +2,10 @@ import os
 import gc
 import sys
 import datetime
+import requests
 import pandas as pd
 import xlwings as xl
+import tkinter as tk
 from tkinter import filedialog
 from tkinter.messagebox import showinfo
 
@@ -84,3 +86,45 @@ def combine_files(files, start_date, end_date, is_standalone):
         showinfo(title="Message", message="Proses Selesai")
     else:
         return saved_as
+
+
+def get_latest_version(repo_owner, repo_name, access_token, file_path, branch, log_box):
+    try:
+        url = f'https://raw.githubusercontent.com/{repo_owner}/{repo_name}/{branch}/{file_path}'
+        headers = {
+            'Authorization': f'token {access_token}'
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.text
+        else:
+            log_box.insert(
+                tk.END, f"{datetime.datetime.now().strftime('%H:%M')} - Pemeriksaan versi gagal, periksa koneksi internet \n")
+            log_box.see("end")
+            return None
+    except:
+        log_box.insert(
+            tk.END, f"{datetime.datetime.now().strftime('%H:%M')} - Pemeriksaan versi gagal, periksa koneksi internet \n")
+        log_box.see("end")
+
+
+def download_latest_package(repo_owner, repo_name, access_token, file_path, branch, log_box):
+    try:
+        url = f'https://raw.githubusercontent.com/{repo_owner}/{repo_name}/{branch}/{file_path}'
+        headers = {
+            'Authorization': f'token {access_token}'
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            with open(f"app.zip", "wb") as file:
+                file.write(response.content)
+            return True
+        else:
+            log_box.insert(
+                tk.END, f"{datetime.datetime.now().strftime('%H:%M')} - Unduhan gagal, periksa koneksi internet \n")
+            log_box.see("end")
+            return False
+    except:
+        log_box.insert(
+            tk.END, f"{datetime.datetime.now().strftime('%H:%M')} - Unduhan gagal, periksa koneksi internet \n")
+        log_box.see("end")
