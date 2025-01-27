@@ -1,4 +1,5 @@
 import os
+import sys
 import threading
 import configparser
 import tkinter as tk
@@ -189,6 +190,28 @@ if __name__ == "__main__":
     def check_thread_process():
         if main_thread.is_alive():
             root.after(5, check_thread_process)
+
+    def start_update_thread(event):
+        global main_thread
+        main_thread = threading.Thread(
+            target=lambda: check_update_function(log_box=log_box, close_thread=close_thread), daemon=True)
+        main_thread.start()
+        progressbar.start()
+        combo_box.state(['disabled'])
+        apex_combo.state(['disabled'])
+        combine_check.config(state='disabled')
+        apex_check.config(state='disabled')
+        calendar_date_entry.state(['disabled'])
+        calendar_date_entry2.state(['disabled'])
+        username_entry.configure(state='disabled')
+        password_entry.configure(state='disabled')
+        username_apex_entry.configure(state='disabled')
+        password_apex_entry.configure(state='disabled')
+        show_password.config(state='disabled')
+        show_password_apex.config(state='disabled')
+        command_btn.state(['disabled'])
+        setting_btn.state(['disabled'])
+        root.after(5, check_thread_process)
 
     def toggle_check():
         global password, show_password
@@ -382,10 +405,8 @@ if __name__ == "__main__":
     help = tk.Menu(menu_bar, tearoff=0)
     menu_bar.add_cascade(label="Help", menu=help)
     help.add_command(label='Periksa Update',
-                     command=lambda: check_update_function(log_box=log_box))
+                     command=lambda: start_update_thread(None))
     help.add_command(label='Manual Book', command=lambda: open_directory())
-    help.add_separator()
-    help.add_command(label='Tentang', command=root.destroy)
 
     root.config(menu=menu_bar)
     root.mainloop()
