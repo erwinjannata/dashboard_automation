@@ -1,7 +1,5 @@
 import os
-import sys
 import threading
-import configparser
 import tkinter as tk
 import tkinter.scrolledtext as tkst
 from pathlib import Path
@@ -17,15 +15,10 @@ from functions.db117_function import DB117
 
 
 if __name__ == "__main__":
-    # Read app configuration
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    current_version = config.get('app_version', 'version')
-
     # Interface configuration
     root = tk.Tk()
     root.configure(bg='white')
-    root.title(f'JNE AMI Dashboard Automation v.{current_version}')
+    root.title(f'JNE AMI Dashboard Automation v.2.3')
     root.resizable(0, 0)
     root.columnconfigure(0, weight=4)
     root.columnconfigure(1, weight=1)

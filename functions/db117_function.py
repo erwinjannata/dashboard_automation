@@ -75,6 +75,11 @@ class DB117:
             password_form.send_keys(self.password_db)
             login_button.click()
 
+            # Check if already logged in
+            wait.until(EC.presence_of_element_located(
+                (By.XPATH, '/html/body/form/header/div[1]/div[2]')))
+            time.sleep(5)
+
             self.log.insert(
                 tk.END, f"{datetime.now().strftime('%H:%M')}  - Logged in as {self.username_db} \n")
             self.log.see("end")
@@ -278,7 +283,7 @@ class DB117:
             # Read first date, Ascending order
             used_date = self.date_from
 
-            # There's particular reason for this
+            # There's a particular reason for this
             time.sleep(5)
 
             # Login
@@ -292,6 +297,11 @@ class DB117:
             username_form.send_keys(self.username_db)
             password_form.send_keys(self.password_db)
             login_button.click()
+
+            # Check if already logged in
+            wait.until(EC.presence_of_element_located(
+                (By.XPATH, '/html/body/form/header/div[1]/div[2]')))
+            time.sleep(5)
 
             self.log.insert(
                 tk.END, f"{datetime.now().strftime('%H:%M')}  - Logged in as {self.username_db} \n")
@@ -344,6 +354,7 @@ class DB117:
                     go_btn.click()
 
                     # Wait data to be generated
+                    time.sleep(10)
                     wait.until(EC.invisibility_of_element_located(
                         (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/div[2]/div[2]/div[2]/div/div/div[1]/table/tbody/tr/td[2]/button')
                     ))
@@ -354,7 +365,7 @@ class DB117:
 
                     # Go into HAWB Page
                     result_link = wait.until(EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="report_table_R4022421634176267448"]/tbody/tr/td[1]/a')))
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[3]/div/div/div[2]/div[2]/div[2]/div/div/div[1]/table/tbody/tr/td[1]/a')))
                     result_link.click()
 
                     # Remove Shipment Type : Domestic
