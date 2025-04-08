@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # Interface configuration
     root = tk.Tk()
     root.configure(bg='white')
-    root.title(f'JNE AMI Dashboard Automation v.2.3')
+    root.title(f'JNE AMI Dashboard Automation v.2.4')
     root.resizable(0, 0)
     root.columnconfigure(0, weight=4)
     root.columnconfigure(1, weight=1)

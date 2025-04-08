@@ -46,7 +46,7 @@ class DB117:
             "download.default_directory": rf"{self.working_dir}\{self.penarikan}"})
         driver = webdriver.Edge(service=Service(
             EdgeChromiumDriverManager().install()), options=options)
-        wait = WebDriverWait(driver, 3600)
+        wait = WebDriverWait(driver, 7200)
 
         # List of downloaded files
         saved_files = []
@@ -60,8 +60,6 @@ class DB117:
 
             # Read first date, Ascending order
             used_date = self.date_from
-
-            time.sleep(5)
 
             # Login
             username_form = wait.until(
@@ -137,11 +135,16 @@ class DB117:
                     go_btn.click()
 
                     # Wait data to be generated
-                    time.sleep(10)
-                    wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH,
-                         '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div/div/div/div/div[1]/div/div/div[2]/div[2]/div/div[2]/div/div[2]/div[2]/div[2]/div/div/div[1]/table/tbody/tr/td[2]/button')
-                    ))
+                    is_generating = True
+
+                    while is_generating == True:
+                        time.sleep(10)
+                        try:
+                            driver.find_element(
+                                By.CSS_SELECTOR, '#report_table_R4057976705178166075 > tbody > tr > td:nth-child(2) > button > img')
+                            is_generating = True
+                        except:
+                            is_generating = False
 
                     # Refresh page after data generated
                     time.sleep(5)
@@ -282,9 +285,6 @@ class DB117:
 
             # Read first date, Ascending order
             used_date = self.date_from
-
-            # There's a particular reason for this
-            time.sleep(5)
 
             # Login
             username_form = wait.until(
