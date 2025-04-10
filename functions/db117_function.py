@@ -79,7 +79,7 @@ class DB117:
             time.sleep(5)
 
             self.log.insert(
-                tk.END, f"{datetime.now().strftime('%H:%M')}  - Logged in as {self.username_db} \n")
+                tk.END, f"{datetime.now().strftime('%H:%M')} - Logged in as {self.username_db} \n")
             self.log.see("end")
 
             # Read current page information

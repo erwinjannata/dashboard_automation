@@ -1,4 +1,6 @@
 import os
+import time
+import schedule
 import threading
 import tkinter as tk
 import tkinter.scrolledtext as tkst
@@ -12,13 +14,14 @@ from tkinter.messagebox import showinfo
 from functions.general_function import combine_files
 from functions.db141_function import DB141
 from functions.db117_function import DB117
-
+from tktimepicker import SpinTimePickerOld
+from tktimepicker import constants
 
 if __name__ == "__main__":
     # Interface configuration
     root = tk.Tk()
     root.configure(bg='white')
-    root.title(f'JNE AMI Dashboard Automation v.2.4')
+    root.title(f'JNE AMI Dashboard Automation v.2.5')
     root.resizable(0, 0)
     root.columnconfigure(0, weight=4)
     root.columnconfigure(1, weight=1)
@@ -28,7 +31,42 @@ if __name__ == "__main__":
     apex = tk.StringVar()
     is_combine = tk.BooleanVar()
     is_apex = tk.BooleanVar()
+    is_scheduled = tk.BooleanVar()
     apex_names = ["Apex11", "Apex12", "Apex16"]
+
+    def determine_process():
+        date = datetime.strptime(calendar_date_entry.get(), '%m/%d/%Y')
+        date2 = datetime.strptime(calendar_date_entry2.get(), '%m/%d/%Y')
+        diff = date2 - date
+        if (username_entry.get() and password_entry.get()) and diff.days >= 0:
+            scheduled_time = time_picker.time()
+            formatted_time = f'{scheduled_time[0]:02}:{scheduled_time[1]:02}'
+            if is_scheduled.get() == True:
+                log_box.insert(
+                    tk.END, f"{datetime.now().strftime('%H:%M')} - Scheduled download at {formatted_time} \n")
+                log_box.see("end")
+                schedule.every().day.at(formatted_time).do(main_process)
+
+                while True:
+                    schedule.run_pending()
+                    time.sleep(1)
+            else:
+                main_process()
+        elif not username_entry.get() or not password_entry.get():
+            showinfo(title='Warning', message="Invalid User")
+            close_thread()
+            return schedule.CancelJob
+        else:
+            showinfo(title='Warning', message="Invalid Date")
+            close_thread()
+            return schedule.CancelJob
+
+    def abort_scheduled_job():
+        log_box.insert(
+            tk.END, f"{datetime.now().strftime('%H:%M')} - Scheduled download cancelled \n")
+        log_box.see("end")
+        schedule.clear()
+        close_thread()
 
     def main_process():
         mode = combo_box.current()
@@ -141,10 +179,11 @@ if __name__ == "__main__":
         else:
             showinfo(title='Warning', message="Invalid Date")
         close_thread()
+        return schedule.CancelJob
 
     def start_thread(event):
         global main_thread
-        main_thread = threading.Thread(target=main_process, daemon=True)
+        main_thread = threading.Thread(target=determine_process, daemon=True)
         main_thread.start()
         combo_box.state(['disabled'])
         apex_combo.state(['disabled'])
@@ -160,6 +199,11 @@ if __name__ == "__main__":
         show_password_apex.config(state='disabled')
         command_btn.state(['disabled'])
         setting_btn.state(['disabled'])
+        time_picker.configureAll(state='disabled')
+        if is_scheduled.get() == True:
+            cancel_btn.state(['!disabled'])
+        menu_bar.entryconfig('File', state='disabled')
+        menu_bar.entryconfig('Help', state='disabled')
         root.after(5, check_thread_process)
 
     def close_thread():
@@ -175,10 +219,15 @@ if __name__ == "__main__":
         show_password_apex.config(state='normal')
         command_btn.state(['!disabled'])
         setting_btn.state(['!disabled'])
+        if is_scheduled.get() == True:
+            time_picker.configureAll(state='normal')
         if is_apex.get() == True:
             apex_combo.state(['!disabled'])
             username_apex_entry.configure(state='normal')
             password_apex_entry.configure(state='normal')
+        cancel_btn.state(['disabled'])
+        menu_bar.entryconfig('File', state='normal')
+        menu_bar.entryconfig('Help', state='normal')
 
     def check_thread_process():
         if main_thread.is_alive():
@@ -204,6 +253,10 @@ if __name__ == "__main__":
         show_password_apex.config(state='disabled')
         command_btn.state(['disabled'])
         setting_btn.state(['disabled'])
+        time_picker.configureAll(state='disabled')
+        cancel_btn.state(['!disabled'])
+        menu_bar.entryconfig('File', state='disabled')
+        menu_bar.entryconfig('Help', state='disabled')
         root.after(5, check_thread_process)
 
     def toggle_check():
@@ -233,8 +286,18 @@ if __name__ == "__main__":
             password_apex_entry.configure(state='disabled')
             show_password_apex.config(state='disabled')
 
+    def toggle_scheduled_option():
+        if is_scheduled.get() == True:
+            time_picker.configureAll(state='normal')
+        else:
+            time_picker.configureAll(state='disabled')
+
     def open_directory():
         os.startfile(Path.cwd())
+
+    def launch_manual_book():
+        file = rf"{Path.cwd()}\Manual Book Automasi Dashboard JNE AMI.pdf"
+        os.startfile(file)
 
     # GUI
     # Download type option
@@ -358,32 +421,62 @@ if __name__ == "__main__":
     ttk.Separator(root, orient='horizontal').grid(
         row=12, column=0, padx=15, pady=5, sticky='ew', columnspan=3)
 
+    password_apex_entry = tk.Entry(
+        root, background='white', width=26, state='disabled')
+    password_apex_entry.default_show_val = password_apex_entry.config(show="*")
+    password_apex_entry.config(show="*")
+    password_apex_entry.grid(row=10, column=2, pady=0, padx=5, sticky='e')
+
+    ttk.Separator(root, orient='horizontal').grid(
+        row=12, column=0, padx=15, pady=5, sticky='ew', columnspan=3)
+
+    # Scheduler
+    ttk.Label(root, text="Penarikan Terjadwal", background="white",
+              font="calibri 11 bold").grid(row=13, column=0, pady=0, padx=5, sticky='w')
+    time_picker = SpinTimePickerOld(root)
+    time_picker.addAll(constants.HOURS24)
+    time_picker.configureAll(state='disabled')
+    time_picker.grid(row=14, column=0, padx=10,
+                     pady=5, sticky='ew', columnspan=3)
+
+    scheduler_check = tk.Checkbutton(
+        root, text="Jadwalkan Penarikan", onvalue=True, offvalue=False, command=toggle_scheduled_option, background='white', variable=is_scheduled)
+    scheduler_check.grid(row=16, column=0, pady=5, padx=5, sticky='w')
+
+    ttk.Separator(root, orient='horizontal').grid(
+        row=17, column=0, padx=15, pady=5, sticky='ew', columnspan=3)
+
     # Start Process Button
     command_btn = ttk.Button(root, text="Start",
                              command=lambda: start_thread(None), state=tk.NORMAL, width=26)
-    command_btn.grid(row=13, column=2, pady=5, padx=5, sticky='e')
+    command_btn.grid(row=18, column=2, pady=5, padx=5, sticky='e')
+
+    # Cancel Schedule Button
+    cancel_btn = ttk.Button(root, text='Batalkan Penarikan Terjadwal',
+                            command=lambda: abort_scheduled_job(), state=tk.DISABLED, width=26)
+    cancel_btn.grid(row=19, column=2, pady=5, padx=5, sticky='e')
 
     # Setting Button
     setting_btn = ttk.Button(
         root, text="Pengaturan", command=lambda: open_setting(rootWindow=root), state=tk.NORMAL, width=26)
-    setting_btn.grid(row=13, column=0, pady=5, padx=5, sticky='w')
+    setting_btn.grid(row=18, column=0, pady=5, padx=5, sticky='w')
 
     # Open Directory Button
     open_dir_btn = ttk.Button(root, text="Folder Unduhan",
                               state=tk.NORMAL, width=26, command=lambda: open_directory())
-    open_dir_btn.grid(row=14, column=0, pady=5, padx=5, sticky='w')
+    open_dir_btn.grid(row=19, column=0, pady=5, padx=5, sticky='w')
 
     # Log Box
     log_label = tk.Label(root, text='Log', background='white', font='calibri 11 bold').grid(
         row=0, column=3, pady=5, padx=5, sticky='w')
     log_box = tkst.ScrolledText(root, width=55, height=18)
     log_box.grid(row=1, column=3, pady=0,
-                 padx=5, sticky='ns', rowspan=13)
+                 padx=5, sticky='ns', rowspan=18)
 
     # Progress Bar
     progressbar = ttk.Progressbar(
         root, mode='indeterminate', orient='horizontal', length=465)
-    progressbar.grid(row=14, column=3, pady=5, padx=5, sticky='w')
+    progressbar.grid(row=19, column=3, pady=5, padx=5, sticky='w')
 
     # Menu Bar
     menu_bar = tk.Menu(root)
@@ -392,6 +485,8 @@ if __name__ == "__main__":
     file.add_command(label='Folder Unduhan', command=lambda: open_directory())
     file.add_command(label='Pengaturan',
                      command=lambda: open_setting(rootWindow=root))
+    file.add_command(label='Manual Book', command=lambda: launch_manual_book())
+
     file.add_separator()
     file.add_command(label='Tutup Aplikasi', command=root.destroy)
 
