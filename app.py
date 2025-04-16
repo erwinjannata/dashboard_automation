@@ -16,6 +16,7 @@ from functions.db141_function import DB141
 from functions.db117_function import DB117
 from tktimepicker import SpinTimePickerOld
 from tktimepicker import constants
+from threading import Event
 
 if __name__ == "__main__":
     # Interface configuration
@@ -34,38 +35,72 @@ if __name__ == "__main__":
     is_scheduled = tk.BooleanVar()
     apex_names = ["Apex11", "Apex12", "Apex16"]
 
+    scheduler_thread = None
+    stop_scheduler = Event()
+
     def determine_process():
+        mode = combo_box.current()
         date = datetime.strptime(calendar_date_entry.get(), '%m/%d/%Y')
         date2 = datetime.strptime(calendar_date_entry2.get(), '%m/%d/%Y')
         diff = date2 - date
+
         if (username_entry.get() and password_entry.get()) and diff.days >= 0:
-            scheduled_time = time_picker.time()
-            formatted_time = f'{scheduled_time[0]:02}:{scheduled_time[1]:02}'
             if is_scheduled.get() == True:
+                global scheduler_thread, stop_scheduler
+                stop_scheduler.set()
+                if scheduler_thread and scheduler_thread.is_alive():
+                    scheduler_thread.join(timeout=1)
+
+                stop_scheduler.clear()
+
+                scheduled_time = time_picker.time()
+                formatted_time = f'{scheduled_time[0]:02}:{scheduled_time[1]:02}'
+
+                schedule.clear()
+                schedule.every().day.at(formatted_time).do(main_process).tag('download_task')
+
                 log_box.insert(
                     tk.END, f"{datetime.now().strftime('%H:%M')} - Scheduled download at {formatted_time} \n")
                 log_box.see("end")
-                schedule.every().day.at(formatted_time).do(main_process)
 
-                while True:
-                    schedule.run_pending()
-                    time.sleep(1)
+                scheduler_thread = threading.Thread(
+                    target=run_scheduler, daemon=True)
+                scheduler_thread.start()
+            else:
+                main_process()
+        elif mode == 6:
+            if is_scheduled.get() == True:
+                showinfo(title='Warning',
+                         message="Proses ini tidak bisa dilakukan secara terjadwal")
+                close_thread()
             else:
                 main_process()
         elif not username_entry.get() or not password_entry.get():
             showinfo(title='Warning', message="Invalid User")
             close_thread()
-            return schedule.CancelJob
         else:
             showinfo(title='Warning', message="Invalid Date")
             close_thread()
-            return schedule.CancelJob
+
+    def run_scheduler():
+        while not stop_scheduler.is_set():
+            schedule.run_pending()
+            time.sleep(1)
 
     def abort_scheduled_job():
+        global scheduler_thread, stop_scheduler
+        stop_scheduler.set()
+        schedule.clear('download_task')
+
+        if scheduler_thread and scheduler_thread.is_alive():
+            scheduler_thread.join(timeout=1)
+            scheduler_thread = None
+
+        stop_scheduler.clear()
+
         log_box.insert(
             tk.END, f"{datetime.now().strftime('%H:%M')} - Scheduled download cancelled \n")
         log_box.see("end")
-        schedule.clear()
         close_thread()
 
     def main_process():
@@ -200,6 +235,7 @@ if __name__ == "__main__":
         command_btn.state(['disabled'])
         setting_btn.state(['disabled'])
         time_picker.configureAll(state='disabled')
+        scheduler_check.config(state='disabled')
         if is_scheduled.get() == True:
             cancel_btn.state(['!disabled'])
         menu_bar.entryconfig('File', state='disabled')
@@ -219,6 +255,7 @@ if __name__ == "__main__":
         show_password_apex.config(state='normal')
         command_btn.state(['!disabled'])
         setting_btn.state(['!disabled'])
+        scheduler_check.config(state='normal')
         if is_scheduled.get() == True:
             time_picker.configureAll(state='normal')
         if is_apex.get() == True:
