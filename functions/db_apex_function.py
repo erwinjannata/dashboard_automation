@@ -9,7 +9,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 
 apex_files = []
@@ -17,7 +16,7 @@ apex_files = []
 
 class ApexDB:
 
-    def __init__(self, username, password, files, name, time, apex_type, working_dir, awb_column):
+    def __init__(self, username, password, files, name, time, apex_type, working_dir, awb_column, driver):
         self.username = username
         self.password = password
         self.files = files
@@ -26,6 +25,7 @@ class ApexDB:
         self.apex_type = apex_type
         self.working_dir = working_dir
         self.awb_column = awb_column
+        self.driver = driver
 
     def get_awb(self):
         # Clear data
@@ -74,9 +74,8 @@ class ApexDB:
         options.add_argument("inprivate")
 
         # Initialize Selenium Webdriver
-        driver = webdriver.Edge(service=Service(
-            EdgeChromiumDriverManager().install()
-        ), options=options)
+        driver = webdriver.Edge(
+            service=Service(self.driver), options=options)
         wait = WebDriverWait(driver, 3600)
 
         try:

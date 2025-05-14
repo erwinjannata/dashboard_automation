@@ -7,15 +7,14 @@ from tkinter.messagebox import showinfo
 from datetime import timedelta, datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.service import Service
-from functions.general_function import combine_files, check_file
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from functions.general_function import combine_files, check_file
 from functions.db_apex_function import ApexDB
 
 
 class DB141:
-    def __init__(self, mode, username_141, password_141, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, log):
+    def __init__(self, mode, username_141, password_141, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, log, driver):
         self.mode = mode
         self.username_db = username_141
         self.password_db = password_141
@@ -31,6 +30,7 @@ class DB141:
         self.apex_name = apex_file_name
         self.penarikan = penarikan
         self.log = log
+        self.driver = driver
 
     def outbound_data141(self):
         # Read app configuration
@@ -46,8 +46,8 @@ class DB141:
         options.add_argument("inprivate")
         options.add_experimental_option("prefs", {
             "download.default_directory": download_dir})
-        driver = webdriver.Edge(service=Service(
-            EdgeChromiumDriverManager().install()), options=options)
+        driver = webdriver.Edge(
+            service=Service(self.driver), options=options)
         wait = WebDriverWait(driver, 3600)
 
         # Read first date, Ascending order
@@ -198,7 +198,8 @@ class DB141:
                                  time="",
                                  apex_type=self.apex_type,
                                  working_dir=self.working_dir,
-                                 awb_column="CNOTE NO")
+                                 awb_column="CNOTE NO",
+                                 driver=self.driver)
                 apex_fn.send_to_apex()
 
             self.log.insert(
@@ -228,8 +229,8 @@ class DB141:
         options.add_argument("inprivate")
         options.add_experimental_option("prefs", {
             "download.default_directory": download_dir})
-        driver = webdriver.Edge(service=Service(
-            EdgeChromiumDriverManager().install()), options=options)
+        driver = webdriver.Edge(
+            service=Service(self.driver), options=options)
         wait = WebDriverWait(driver, 3600)
 
         # List of downloaded file
@@ -409,7 +410,8 @@ class DB141:
                                  time="",
                                  apex_type=self.apex_type,
                                  working_dir=self.working_dir,
-                                 awb_column="AWB NO")
+                                 awb_column="AWB NO",
+                                 driver=self.driver)
                 apex_fn.send_to_apex()
 
             self.log.insert(

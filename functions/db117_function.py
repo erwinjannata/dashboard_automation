@@ -11,11 +11,10 @@ from selenium.webdriver.edge.service import Service
 from functions.general_function import combine_files, check_file
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 
 class DB117:
-    def __init__(self, username_117, password_117, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, log):
+    def __init__(self, username_117, password_117, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, log, driver):
         self.username_db = username_117
         self.password_db = password_117
         self.username_apex = username_apex
@@ -30,6 +29,7 @@ class DB117:
         self.apex_name = apex_file_name
         self.penarikan = penarikan
         self.log = log
+        self.driver = driver
 
     def inbound_data117(self):
         # Read app configuration
@@ -43,9 +43,10 @@ class DB117:
         options.add_argument("start-maximized")
         options.add_argument("inprivate")
         options.add_experimental_option("prefs", {
-            "download.default_directory": rf"{self.working_dir}\{self.penarikan}"})
-        driver = webdriver.Edge(service=Service(
-            EdgeChromiumDriverManager().install()), options=options)
+            "download.default_directory": rf"{self.working_dir}\{self.penarikan}",
+        })
+        driver = webdriver.Edge(
+            service=Service(self.driver), options=options)
         wait = WebDriverWait(driver, 7200)
 
         # List of downloaded files
@@ -240,7 +241,8 @@ class DB117:
                                  time="",
                                  apex_type=self.apex_type,
                                  working_dir=self.working_dir,
-                                 awb_column="Hawb No")
+                                 awb_column="Hawb No",
+                                 driver=self.driver)
                 apex_fn.send_to_apex()
 
             self.log.insert(
@@ -268,9 +270,10 @@ class DB117:
         options.add_argument("start-maximized")
         options.add_argument("inprivate")
         options.add_experimental_option("prefs", {
-            "download.default_directory": rf"{self.working_dir}\{self.penarikan}"})
-        driver = webdriver.Edge(service=Service(
-            EdgeChromiumDriverManager().install()), options=options)
+            "download.default_directory": rf"{self.working_dir}\{self.penarikan}",
+        })
+        driver = webdriver.Edge(
+            service=Service(self.driver), options=options)
         wait = WebDriverWait(driver, 3600)
 
         # List of downloaded files
@@ -453,7 +456,8 @@ class DB117:
                                  time="",
                                  apex_type=self.apex_type,
                                  working_dir=self.working_dir,
-                                 awb_column="Cnote No")
+                                 awb_column="Cnote No",
+                                 driver=self.driver)
                 apex_fn.send_to_apex()
 
             self.log.insert(

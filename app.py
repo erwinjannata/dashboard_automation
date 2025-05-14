@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # Interface configuration
     root = tk.Tk()
     root.configure(bg='white')
-    root.title(f'JNE AMI Dashboard Automation v.2.5')
+    root.title(f'JNE AMI Dashboard Automation v.2.6')
     root.resizable(0, 0)
     root.columnconfigure(0, weight=4)
     root.columnconfigure(1, weight=1)
@@ -117,6 +117,7 @@ if __name__ == "__main__":
         apex_name = apex_names[apex_combo.current()]
         global apex_file_name
         apex_file_name = ""
+        driver_location = rf"{working_directory}\webdriver\msedgedriver.exe"
 
         if (username and password) and diff.days >= 0:
             if is_apex.get() == True:
@@ -144,7 +145,9 @@ if __name__ == "__main__":
                                  apex_type=apex_name,
                                  apex_file_name=apex_file_name,
                                  penarikan=jam_penarikan,
-                                 log=log_box)
+                                 log=log_box,
+                                 driver=driver_location
+                                 )
 
             # Initialize Class Dashboard 117
             dashboard117 = DB117(username_117=username,
@@ -160,7 +163,8 @@ if __name__ == "__main__":
                                  apex_type=apex_name,
                                  apex_file_name=apex_file_name,
                                  penarikan=jam_penarikan,
-                                 log=log_box)
+                                 log=log_box,
+                                 driver=driver_location)
 
             # 141 - Outbound
             if mode == 0:
