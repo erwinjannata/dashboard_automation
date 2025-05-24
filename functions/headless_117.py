@@ -1,6 +1,5 @@
 import os
 import time
-import configparser
 from selenium import webdriver
 from datetime import timedelta, datetime
 from selenium.webdriver.common.by import By
@@ -8,11 +7,12 @@ from functions.db_apex_function import ApexDB
 from functions.general_function import combine_files, check_file
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.edge.service import Service
 
 
 class DB117:
-    def __init__(self, username_117, password_117, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, driver):
+    def __init__(self, link, username_117, password_117, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, driver):
+        self.link = link
         self.username_db = username_117
         self.password_db = password_117
         self.username_apex = username_apex
@@ -30,19 +30,19 @@ class DB117:
 
     def inbound_data117(self):
         # Read app configuration
-        config = configparser.ConfigParser()
-        config.read('config.ini')
-        base_link = config.get('base_links', '117')
+        base_link = self.link
 
         # Initialize webdriver
-        options = webdriver.ChromeOptions()
+        options = webdriver.EdgeOptions()
         options.use_chromium = True
+        options.add_argument("start-maximized")
+        options.add_argument("inprivate")
         options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-extensions")
         options.add_experimental_option("prefs", {
             "download.default_directory": rf"{self.working_dir}\{self.penarikan}"})
-        driver = webdriver.Edge(service=Service(self.driver), options=options)
+        driver = webdriver.Edge(
+            service=Service(self.driver), options=options)
         wait = WebDriverWait(driver, 7200)
 
         # List of downloaded files
@@ -125,16 +125,9 @@ class DB117:
                     go_btn.click()
 
                     # Wait data to be generated
-                    is_generating = True
-
-                    while is_generating == True:
-                        time.sleep(10)
-                        try:
-                            driver.find_element(
-                                By.CSS_SELECTOR, '#report_table_R4057976705178166075 > tbody > tr > td:nth-child(2) > button > img')
-                            is_generating = True
-                        except:
-                            is_generating = False
+                    time.sleep(5)
+                    wait.until(EC.text_to_be_present_in_element(
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div/div/div/div/div[1]/div/div/div[2]/div[2]/div/div[2]'), "DONE"))
 
                     # Refresh page after data generated
                     time.sleep(5)
@@ -204,6 +197,7 @@ class DB117:
                 used_date -= timedelta(days=1)
 
             # Close webdriver
+            driver.close()
             driver.quit()
 
             # Combine data if required
@@ -225,20 +219,20 @@ class DB117:
                                  driver=self.driver)
                 apex_fn.send_to_apex()
         except Exception as e:
+            driver.close()
             driver.quit()
 
     def outbound_data117(self):
         # Read app configuration
-        config = configparser.ConfigParser()
-        config.read('config.ini')
-        base_link = config.get('base_links', '117')
+        base_link = self.link
 
         # Initialize webdriver
-        options = webdriver.ChromeOptions()
+        options = webdriver.EdgeOptions()
         options.use_chromium = True
+        options.add_argument("start-maximized")
+        options.add_argument("inprivate")
         options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-extensions")
         options.add_experimental_option("prefs", {
             "download.default_directory": rf"{self.working_dir}\{self.penarikan}"})
         driver = webdriver.Edge(service=Service(self.driver), options=options)

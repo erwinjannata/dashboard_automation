@@ -136,16 +136,9 @@ class DB117:
                     go_btn.click()
 
                     # Wait data to be generated
-                    is_generating = True
-
-                    while is_generating == True:
-                        time.sleep(10)
-                        try:
-                            driver.find_element(
-                                By.CSS_SELECTOR, '#report_table_R4057976705178166075 > tbody > tr > td:nth-child(2) > button > img')
-                            is_generating = True
-                        except:
-                            is_generating = False
+                    time.sleep(5)
+                    wait.until(EC.text_to_be_present_in_element(
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div/div/div/div/div[1]/div/div/div[2]/div[2]/div/div[2]'), "DONE"))
 
                     # Refresh page after data generated
                     time.sleep(5)
@@ -357,11 +350,9 @@ class DB117:
                     go_btn.click()
 
                     # Wait data to be generated
-                    time.sleep(10)
-                    wait.until(EC.invisibility_of_element_located(
-                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div/div[2]/div[2]/div/div[1]/div/div[2]/div[2]/div[2]/div/div/div[1]/table/tbody/tr/td[2]/button')
-                    ))
                     time.sleep(5)
+                    wait.until(EC.text_to_be_present_in_element(
+                        (By.XPATH, '/html/body/form/div[1]/div[2]/div[2]/main/div[2]/div/div[2]/div/div/div[2]/div[2]/div[2]/div/div/div/div/div/div[1]/div/div/div[2]/div[2]/div/div[2]'), "DONE"))
 
                     # Refresh after data generated
                     driver.refresh()

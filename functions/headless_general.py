@@ -34,7 +34,7 @@ def check_file(file, current_date, column_name):
         return False
 
 
-def combine_files(files, start_date, end_date, is_standalone):
+def combine_files(files, start_date, end_date):
     path = os.path.split(files[0])[0]
     saved_as = rf"{path}\{start_date.strftime('%d-%b-%Y')} - {end_date.strftime('%d-%b-%Y')}.xlsx"
 

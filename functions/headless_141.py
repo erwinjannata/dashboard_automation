@@ -1,10 +1,10 @@
 import os
 import time
-import configparser
+import shutil
 from selenium import webdriver
 from datetime import timedelta
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.edge.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from functions.db_apex_function import ApexDB
@@ -12,7 +12,8 @@ from functions.general_function import combine_files, check_file
 
 
 class DB141:
-    def __init__(self, mode, username_141, password_141, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, driver):
+    def __init__(self, link, mode, username_141, password_141, username_apex, password_apex, date_from, date_thru, loop, is_combine, is_apex, working_dir, apex_type, apex_file_name, penarikan, driver, cloud_dir):
+        self.link = link
         self.mode = mode
         self.username_db = username_141
         self.password_db = password_141
@@ -28,23 +29,23 @@ class DB141:
         self.apex_name = apex_file_name
         self.penarikan = penarikan
         self.driver = driver
+        self.cloud_dir = cloud_dir
 
     def outbound_data141(self):
         # Read app configuration
-        config = configparser.ConfigParser()
-        config.read('config.ini')
-        base_link = config.get('base_links', '141')
+        base_link = self.link
 
         # Initialize webdriver
         download_dir = rf"{self.working_dir}\{self.penarikan}"
-        options = webdriver.ChromeOptions()
+        options = webdriver.EdgeOptions()
         options.use_chromium = True
+        options.add_argument("start-maximized")
+        options.add_argument("inprivate")
         options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-extensions")
         options.add_experimental_option("prefs", {
             "download.default_directory": download_dir})
-        driver = webdriver.Chrome(
+        driver = webdriver.Edge(
             service=Service(self.driver), options=options)
         wait = WebDriverWait(driver, 3600)
 
@@ -187,17 +188,16 @@ class DB141:
 
     def inbound_data141(self):
         # Read app configuration
-        config = configparser.ConfigParser()
-        config.read('config.ini')
-        base_link = config.get('base_links', '141')
+        base_link = self.link
 
         # Initialize webdriver
         download_dir = rf"{self.working_dir}\{self.penarikan}"
-        options = webdriver.ChromeOptions()
+        options = webdriver.EdgeOptions()
         options.use_chromium = True
+        options.add_argument("start-maximized")
+        options.add_argument("inprivate")
         options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-extensions")
         options.add_experimental_option("prefs", {
             "download.default_directory": download_dir})
         driver = webdriver.Edge(service=Service(self.driver), options=options)
